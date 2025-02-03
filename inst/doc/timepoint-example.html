@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>gimap for Timepoint Experiment</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">gimap for Timepoint Experiment</h1>
+
+
+
+<div id="gimap-tutorial-for-timepoints" class="section level1">
+<h1>gimap tutorial for timepoints</h1>
+<p>gimap performs analysis of dual-targeting CRISPR screening data, with
+the goal of aiding the identification of genetic interactions
+(e.g. cooperativity, synthetic lethality) in models of disease and other
+biological contexts. gimap analyzes functional genomic data generated by
+the pgPEN (paired guide RNAs for genetic interaction mapping) approach,
+quantifying growth effects of single and paired gene knockouts upon
+application of a CRISPR library. A multitude of CRISPR screen types can
+be used for this analysis, with helpful descriptions found in this
+review (<a href="https://www.nature.com/articles/s43586-021-00093-4" class="uri">https://www.nature.com/articles/s43586-021-00093-4</a>). Use
+of pgPEN and GI-mapping in a paired gRNA format can be found here (<a href="https://pubmed.ncbi.nlm.nih.gov/34469736/" class="uri">https://pubmed.ncbi.nlm.nih.gov/34469736/</a>).</p>
+<p>First let’s create a folder we will save files to.</p>
+<pre><code>output_dir &lt;- &quot;output_timepoints&quot;
+dir.create(output_dir, showWarnings = FALSE)</code></pre>
+<div id="data-loading-and-setup" class="section level2">
+<h2>Data loading and setup</h2>
+<p>In this example we are going to examine a dataset with
+timepoints.</p>
+<p>Let’s examine this example pgPEN counts table. It’s divided into
+columns containing:</p>
+<ul>
+<li><code>id</code>: an ID corresponding to the names of paired
+guides</li>
+<li><code>seq_1</code>: gRNA sequence 1, targeting “paralog A”</li>
+<li><code>seq_2</code>: gRNA sequence 2, targeting “paralog B”</li>
+<li><code>Day00_RepA</code>: Gene Counts from Day 00 for Replicate
+A</li>
+<li><code>Day05_RepA</code>: Gene Counts from Day 05 for Replicate
+A</li>
+<li><code>Day22_RepA</code>: Gene Counts from Day 22 for Replicate
+A</li>
+<li><code>Day22_RepB</code>: Gene Counts from Day 22 for Replicate
+B</li>
+</ul>
+<p>For the purposes of this tutorial, we can grab example data from the
+package.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>example_data <span class="ot">&lt;-</span> <span class="fu">get_example_data</span>(<span class="st">&quot;count&quot;</span>)</span></code></pre></div>
+<p>The metadata you have may vary slightly from this but you’ll want to
+make sure you have the essential variables and information regarding how
+you collected your data.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">colnames</span>(example_data)</span></code></pre></div>
+</div>
+<div id="setting-up-data" class="section level2">
+<h2>Setting up data</h2>
+<p>We’re going to set up three datasets that we will provide to the
+<code>set_up()</code> function to create a <code>gimap</code> dataset
+object.</p>
+<ul>
+<li><code>counts</code> - the counts generated from pgPEN</li>
+<li><code>pg_ids</code> - the IDs that correspond to the rows of the
+counts and specify the construct</li>
+<li><code>sample_metadata</code> - metadata that describes the columns
+of the counts including their timepoints</li>
+</ul>
+<p>For this example we are using a timepoint dataset.</p>
+<p>Required for a timepoint analysis is a Day 0 (or plasmid) sample, and
+at least one further timepoint sample. The T0 sample, or plasmid sample,
+will represent the entire library before any type of selection has
+occurred during the length of the screen. This is the baseline for guide
+RNA representation. The length of time cells should remain in culture
+throughout the screen is heavily dependent on the type of selection
+occurring, helpful advice can be found in (<a href="https://www.nature.com/articles/s43586-021-00093-4" class="uri">https://www.nature.com/articles/s43586-021-00093-4</a>). QC
+analysis will follow to correlate replicates if inputted. Comparison of
+early and late timepoints is possible in this function, but not required
+if early timepoints were not taken.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>counts <span class="ot">&lt;-</span> example_data <span class="sc">%&gt;%</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="st">&quot;Day00_RepA&quot;</span>, <span class="st">&quot;Day05_RepA&quot;</span>, <span class="st">&quot;Day22_RepA&quot;</span>, <span class="st">&quot;Day22_RepB&quot;</span>, <span class="st">&quot;Day22_RepC&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="fu">as.matrix</span>()</span></code></pre></div>
+<p>The next datasets are metadata that describe the dimensions of the
+count data.</p>
+<ul>
+<li>These both need to be data frames.</li>
+<li>The sizes of these metadata must correspond to the dimensions of the
+counts data.</li>
+</ul>
+<p><code>pg_id</code> are just the unique IDs listed in the same
+order/sorted the same way as the count data and can be used for mapping
+between the count data and the metadata. This is required and very
+important because it is necessary to know the IDs and be able to map
+them to pgRNA constructs and counts data.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>pg_ids <span class="ot">&lt;-</span> example_data <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="st">&quot;id&quot;</span>)</span></code></pre></div>
+<p>Sample metadata is the information that describes the samples and is
+sorted the same order as the columns in the count data.</p>
+<p>You need to have two columns in the metadata you provide. You’ll need
+to specify the names of these columns in the
+<code>gimap_annotate()</code> function.</p>
+<ul>
+<li><code>col_names</code> - Must match the colnames of the counts data
+being submitted</li>
+<li><code>timepoints</code> - A numeric variable that describes the
+timepoints for these data.</li>
+</ul>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>sample_metadata <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  <span class="at">col_names =</span> <span class="fu">c</span>(<span class="st">&quot;Day00_RepA&quot;</span>, <span class="st">&quot;Day05_RepA&quot;</span>, <span class="st">&quot;Day22_RepA&quot;</span>, <span class="st">&quot;Day22_RepB&quot;</span>, <span class="st">&quot;Day22_RepC&quot;</span>),</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  <span class="at">day =</span> <span class="fu">as.numeric</span>(<span class="fu">c</span>(<span class="st">&quot;0&quot;</span>, <span class="st">&quot;5&quot;</span>, <span class="st">&quot;22&quot;</span>, <span class="st">&quot;22&quot;</span>, <span class="st">&quot;22&quot;</span>)),</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>  <span class="at">rep =</span> <span class="fu">as.factor</span>(<span class="fu">c</span>(<span class="st">&quot;RepA&quot;</span>, <span class="st">&quot;RepA&quot;</span>, <span class="st">&quot;RepA&quot;</span>, <span class="st">&quot;RepB&quot;</span>, <span class="st">&quot;RepC&quot;</span>))</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>)</span></code></pre></div>
+<p>We’ll need to provide <code>counts</code>, <code>pg_ids</code> and
+<code>sample_metadata</code> to <code>setup_data()</code>.</p>
+<p>Now let’s setup our data using <code>setup_data()</code>. Optionally
+we can provide the metadata in this function as well so that it is
+stored with the data.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>gimap_dataset <span class="ot">&lt;-</span> <span class="fu">setup_data</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="at">counts =</span> counts,</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">pg_ids =</span> pg_ids,</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="at">sample_metadata =</span> sample_metadata</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>)</span></code></pre></div>
+<p>You’ll notice that this set up gives us a list of formatted data.
+This contains the original counts we gave <code>setup_data()</code>
+function but also normalized counts, and the total counts per
+sample.</p>
+<ul>
+<li><code>raw_counts</code>: The original counts data that illustrates
+the number of cells alive in the sample. This data has samples as the
+columns and the paired guide constructs as rows.</li>
+<li><code>counts_per_sample</code>: Add up all the counts for each
+sample over all of the paired guide designs.</li>
+<li>Transformed data: This section contains the various types of
+normalized and adjusted data made from the raw counts data.</li>
+<li><code>count_norm</code> - For each sample, the data is normalized
+<code>-log10(( counts +1) /  total counts for the sample over all the pg designs ))</code></li>
+<li><code>cpm</code> - For each sample this is calculated by taking the
+<code>counts / total counts for the sample over all the pg designs)*1e6</code></li>
+<li><code>log2cpm</code>: log-2 transformed counts per million this is
+calculated by <code>log2(cpms + 1)</code></li>
+<li>pg_metadata: paired guide metadata - information that describes the
+paired-guided RNA designs. This may include the sequences used in the
+CRISPR design as well as what genes are targeted.</li>
+<li><code>sample_metadata</code>: Metadata that describes the samples.
+This likely includes the time point information, replicates, sample IDs,
+and any other additional information that is needed regarding the
+experimental setup.</li>
+</ul>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">str</span>(gimap_dataset)</span></code></pre></div>
+</div>
+<div id="quality-checks" class="section level2">
+<h2>Quality Checks</h2>
+<p>The first step is running some quality checks on our data. The
+<code>run_qc()</code> function will create a report we can look at to
+assess this.</p>
+<p>The report includes several visualizations of raw/unfiltered
+data:</p>
+<ul>
+<li>distribution of normalized counts for each sample. The goal of
+determining this distribution is to identify pgRNA counts that are low
+at the start of the screen - before any type of phenotypic or growth
+selection is occurring, either in the T0 or plasmid sample. These low
+abundance pgRNAs should be removed from the analysis. [the goal section
+here doesn’t fit my expectations/understanding of this plot.]</li>
+<li>histogram of <code>log2cpm</code> values for each individual sample:
+this helps users identify samples that do not have a normal distribution
+of reads and inform the upcoming filtering steps.</li>
+<li>sample correlation heatmap: generates a heatmap using cpm values for
+each replicate/sample. This heatmap gives an overview on how similar
+samples are. Replicates should correlate well, and cluster together,
+while each timepoint sample should be different from the T0. This
+analysis will also allow users to identify potential sample swaps, if
+correlation scores between replicates is poor.</li>
+<li>A histogram that shows the variance within replicates for each pgRNA
+construct. For each pgRNA construct, the variance among the 3 replicates
+is found and a distribution is constructed by looking at these variances
+together.</li>
+<li>A histogram of the log2 CPM values of pgRNA constructs at the
+plasmid time point. This graph relates to a plasmid filter that can be
+applied to the data, but the plot displays all of the data prior to a
+filter being applied.</li>
+</ul>
+<p>This report also includes several visualizations after filters are
+applied:</p>
+<p>There is a filter that flags pgRNA constructs where any of the time
+points have a count of zero. - We include a bar plot that shows the
+number of pgRNA constructs which have counts of zero in either 0, 1, 2,
+or 3 replicates. - We include a table that specifies how many pgRNAs
+would be filtered out by applying this filter.</p>
+<p>There is a filter that flags pgRNA constructs that have low log2 CPM
+counts for the day 0 or plasmid time point. - The histogram of the log2
+CPM values of pgRNA constructs at the plasmid time point mentioned
+earlier does have a dashed line specifying the lower outlier (or a user
+defined cutoff) and pgRNA constructs with a plasmid log2 CPM lower than
+that value can be filtered out. - We include a table that specifies how
+many pgRNAs would be filtered out by applying this filter.</p>
+<p>There is a filter that flags pgRNA constructs that have low log2 CPM
+counts for the day 0 or plasmid time point. - The histogram of the log2
+CPM values of pgRNA constructs at the plasmid time point mentioned
+earlier does have a dashed line specifying the lower outlier (or a user
+defined cutoff) and pgRNA constructs with a plasmid log2 CPM lower than
+that value can be filtered out. - We include a table that specifies how
+many pgRNAs would be filtered out by applying this filter.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">run_qc</span>(gimap_dataset,</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>       <span class="at">output_file =</span> <span class="st">&quot;example_qc_report.Rmd&quot;</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>       <span class="at">overwrite =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>       <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p>You can take a look at an <a href="http://htmlpreview.github.io/?https://raw.githubusercontent.com/FredHutch/gimap/main/inst/example_qc_report.html">example
+QC report here</a>.</p>
+</div>
+<div id="filtering-the-data" class="section level2">
+<h2>Filtering the data</h2>
+<p>After considering the QC report and which filters are
+appropriate/desired for your data, you can apply filters to the data
+using the <code>gimap_filter</code> function.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>gimap_dataset <span class="ot">&lt;-</span> gimap_dataset <span class="sc">%&gt;%</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  <span class="fu">gimap_filter</span>()</span></code></pre></div>
+<p>Filtered forms of the data can be seen in the
+<code>$filtered_data entry</code></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">str</span>(gimap_dataset<span class="sc">$</span>filtered_data)</span></code></pre></div>
+<p>Let’s take a look at how many rows of data we have left:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">nrow</span>(gimap_dataset<span class="sc">$</span>filtered_data<span class="sc">$</span>transformed_log2_cpm)</span></code></pre></div>
+<p>As you can see from the output above, there are fewer pgRNA
+constructs in the filtered dataset following completion of
+filtering.</p>
+<p>The filtering step also stores two tables of information that you may
+want to use or report.</p>
+<ul>
+<li><code>$filtered_data$removed_pg_ids</code> is a table that has the
+pgRNA construct IDs that are removed following completion of filtering
+in the <code>id</code> column and the relevant filter(s) that led to
+removal as a comma separated list in the <code>relevantFilters</code>
+column</li>
+<li><code>$filtered_data$all_reps_zerocount_ids</code> is a table that
+lists the IDs of pgRNA constructs which had a count of 0 for all final
+timepoint replicates. These pgRNA constructs are NOT necessarily
+filtered out</li>
+</ul>
+<p>Now that you’ve performed QC and filtering, the rest of the pipeline
+can be run</p>
+<ul>
+<li>First annotating the data set (expression levels, copy number, etc.)
+with DepMap data. For the annotation step, you <em>must</em> specify
+which <code>cell_line</code> your data uses so that the correct
+corresponding DepMap data is used for annotation. This function is
+<code>gimap_annotate()</code></li>
+<li>Then the data is normalized with the <code>gimap_normalize()</code>
+function. <code>timepoints</code> needs to be specified pointing to the
+correct column names from the <code>sample_data</code> passed to the
+<code>setup_data()</code> function earlier.</li>
+<li>Genetic interaction scores are computed with the
+<code>calc_gi()</code> function.</li>
+</ul>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>gimap_dataset <span class="ot">&lt;-</span> gimap_dataset <span class="sc">%&gt;%</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>  <span class="fu">gimap_annotate</span>(<span class="at">cell_line =</span> <span class="st">&quot;HELA&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>  <span class="fu">gimap_normalize</span>(</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>    <span class="at">timepoints =</span> <span class="st">&quot;day&quot;</span></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>  <span class="fu">calc_gi</span>()</span></code></pre></div>
+<p>Take a look at the results.</p>
+<p>Here’s what’s included in the GI Scores table:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">head</span>(gimap_dataset<span class="sc">$</span>gi_scores)</span></code></pre></div>
+<p>Let’s check out the top results</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">head</span>(dplyr<span class="sc">::</span><span class="fu">arrange</span>(gimap_dataset<span class="sc">$</span>gi_score, fdr))</span></code></pre></div>
+</div>
+<div id="plot-the-results" class="section level2">
+<h2>Plot the results</h2>
+<p>You can remove any samples from these plots by altering the
+<code>reps_to_drop</code> argument.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="fu">plot_exp_v_obs_scatter</span>(gimap_dataset, <span class="at">reps_to_drop =</span> <span class="st">&quot;Day05_RepA_early&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="fu">plot_rank_scatter</span>(gimap_dataset, <span class="at">reps_to_drop =</span> <span class="st">&quot;Day05_RepA_early&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="fu">plot_volcano</span>(gimap_dataset, <span class="at">reps_to_drop =</span> <span class="st">&quot;Day05_RepA_early&quot;</span>)</span></code></pre></div>
+<div id="plot-specific-target-pair" class="section level3">
+<h3>Plot specific target pair</h3>
+<p>We can pick out a specific pair to plot.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="co"># &quot;NDEL1_NDE1&quot; is top result so let&#39;s plot that</span></span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a><span class="fu">plot_targets_bar</span>(gimap_dataset, <span class="at">target1 =</span> <span class="st">&quot;NDEL1&quot;</span>, <span class="at">target2 =</span> <span class="st">&quot;NDE1&quot;</span>)</span></code></pre></div>
+</div>
+</div>
+<div id="saving-results-to-files" class="section level2">
+<h2>Saving results to files</h2>
+<p>We can save the genetic interactions scores like this:</p>
+<pre><code>readr::write_tsv(gimap_dataset$gi_scores, file.path(output_dir, &quot;gi_scores.tsv&quot;))</code></pre>
+<p>We can save all these data as an RDS.</p>
+<pre><code>saveRDS(gimap_dataset, &quot;gimap_dataset_final_timepoint.RDS&quot;)</code></pre>
+</div>
+<div id="session-info" class="section level2">
+<h2>Session Info</h2>
+<p>This is just for provenance purposes.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
