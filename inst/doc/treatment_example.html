@@ -352,10 +352,26 @@ application of a CRISPR library. A multitude of CRISPR screen types can
 be used for this analysis, with helpful descriptions found in this
 review (<a href="https://www.nature.com/articles/s43586-021-00093-4" class="uri">https://www.nature.com/articles/s43586-021-00093-4</a>). Use
 of pgPEN and GI-mapping in a paired gRNA format can be found here (<a href="https://pubmed.ncbi.nlm.nih.gov/34469736/" class="uri">https://pubmed.ncbi.nlm.nih.gov/34469736/</a>).</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(gimap)</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code></pre></div>
+<div id="requirements" class="section level2">
+<h2>Requirements</h2>
+<p>Besides installing the gimap package, you will also need to install
+wget if you do not already have it installed. This will allow you to
+download the annotation files needed to run <code>gimap</code>.</p>
+<p><a href="https://phoenixnap.com/kb/wget-command-with-examples#How_to_Install_wget">How
+to install wget</a></p>
+<p>To install this package you will need to run:</p>
+<pre><code>install.packages(&quot;gimap&quot;)</code></pre>
+<p>Or you can install the development version from GitHub:</p>
+<pre><code>install.packages(&quot;remotes&quot;)
+remotes::install_github(&quot;FredHutch/gimap&quot;)</code></pre>
+</div>
+<div id="loading-needed-packages" class="section level2">
+<h2>Loading needed packages</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">library</span>(gimap)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code></pre></div>
 <pre><code>output_dir &lt;- &quot;output_treatment&quot;
 dir.create(output_dir, showWarnings = FALSE)</code></pre>
+</div>
 <div id="data-loading-and-setup" class="section level2">
 <h2>Data loading and setup</h2>
 <p>In this example we are going to examine a dataset with drug
@@ -375,11 +391,11 @@ guides</li>
 </ul>
 <p>For the purposes of this tutorial, we can grab example data from the
 package.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>example_data <span class="ot">&lt;-</span> <span class="fu">get_example_data</span>(<span class="st">&quot;count_treatment&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>example_data <span class="ot">&lt;-</span> <span class="fu">get_example_data</span>(<span class="st">&quot;count_treatment&quot;</span>)</span></code></pre></div>
 <p>The metadata you have may vary slightly from this but you’ll want to
 make sure you have the essential variables and information regarding how
 you collected your data.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">colnames</span>(example_data)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">colnames</span>(example_data)</span></code></pre></div>
 </div>
 <div id="setting-up-data" class="section level2">
 <h2>Setting up data</h2>
@@ -396,9 +412,9 @@ of the counts including their timepoints</li>
 <p>For this example we are using a treatment dataset where there is a
 pretreatment sample, two vehicle replicates and two drug treated
 replicates.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>counts <span class="ot">&lt;-</span> example_data <span class="sc">%&gt;%</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="st">&quot;pretreatment&quot;</span>, <span class="st">&quot;dmsoA&quot;</span>, <span class="st">&quot;dmsoB&quot;</span>, <span class="st">&quot;drug1A&quot;</span>, <span class="st">&quot;drug1B&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="fu">as.matrix</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>counts <span class="ot">&lt;-</span> example_data <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="st">&quot;pretreatment&quot;</span>, <span class="st">&quot;dmsoA&quot;</span>, <span class="st">&quot;dmsoB&quot;</span>, <span class="st">&quot;drug1A&quot;</span>, <span class="st">&quot;drug1B&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="fu">as.matrix</span>()</span></code></pre></div>
 <p>The next datasets are metadata that describe the dimensions of the
 count data.</p>
 <ul>
@@ -411,8 +427,8 @@ order/sorted the same way as the count data and can be used for mapping
 between the count data and the metadata. This is required and very
 important because it is necessary to know the IDs and be able to map
 them to pgRNA constructs and counts data.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>pg_ids <span class="ot">&lt;-</span> example_data <span class="sc">%&gt;%</span></span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="st">&quot;id&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>pg_ids <span class="ot">&lt;-</span> example_data <span class="sc">%&gt;%</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="st">&quot;id&quot;</span>)</span></code></pre></div>
 <p>Sample metadata is the information that describes the samples and is
 sorted the same order as the columns in the count data.</p>
 <p>You need to have two columns in the metadata you provide. You’ll need
@@ -426,20 +442,20 @@ treatments for these data. The label for the control specified in this
 column will need to be supplied to the <code>gimap_normalize()</code>
 function.</li>
 </ul>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>sample_metadata <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="at">col_names =</span> <span class="fu">c</span>(<span class="st">&quot;pretreatment&quot;</span>, <span class="st">&quot;dmsoA&quot;</span>, <span class="st">&quot;dmsoB&quot;</span>, <span class="st">&quot;drug1A&quot;</span>, <span class="st">&quot;drug1B&quot;</span>),</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">drug_treatment =</span> <span class="fu">as.factor</span>(<span class="fu">c</span>(<span class="st">&quot;pretreatment&quot;</span>, <span class="st">&quot;dmso&quot;</span>, <span class="st">&quot;dmso&quot;</span>, <span class="st">&quot;drug&quot;</span>, <span class="st">&quot;drug&quot;</span>))</span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>sample_metadata <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="at">col_names =</span> <span class="fu">c</span>(<span class="st">&quot;pretreatment&quot;</span>, <span class="st">&quot;dmsoA&quot;</span>, <span class="st">&quot;dmsoB&quot;</span>, <span class="st">&quot;drug1A&quot;</span>, <span class="st">&quot;drug1B&quot;</span>),</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="at">drug_treatment =</span> <span class="fu">as.factor</span>(<span class="fu">c</span>(<span class="st">&quot;pretreatment&quot;</span>, <span class="st">&quot;dmso&quot;</span>, <span class="st">&quot;dmso&quot;</span>, <span class="st">&quot;drug&quot;</span>, <span class="st">&quot;drug&quot;</span>))</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>)</span></code></pre></div>
 <p>We’ll need to provide <code>counts</code>, <code>pg_ids</code> and
 <code>sample_metadata</code> to <code>setup_data()</code>.</p>
 <p>Now let’s setup our data using <code>setup_data()</code>. Optionally
 we can provide the metadata in this function as well so that it is
 stored with the data.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>gimap_dataset <span class="ot">&lt;-</span> <span class="fu">setup_data</span>(</span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  <span class="at">counts =</span> counts,</span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="at">pg_ids =</span> pg_ids,</span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  <span class="at">sample_metadata =</span> sample_metadata</span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>gimap_dataset <span class="ot">&lt;-</span> <span class="fu">setup_data</span>(</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  <span class="at">counts =</span> counts,</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  <span class="at">pg_ids =</span> pg_ids,</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>  <span class="at">sample_metadata =</span> sample_metadata</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>)</span></code></pre></div>
 <p>You’ll notice that this set up gives us a list of formatted data.
 This contains the original counts we gave <code>setup_data()</code>
 function but also normalized counts, and the total counts per
@@ -466,9 +482,9 @@ This likely includes the time point information, replicates, sample IDs,
 and any other additional information that is needed regarding the
 experimental setup.</li>
 </ul>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">str</span>(gimap_dataset)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">str</span>(gimap_dataset)</span></code></pre></div>
 <p>Let’s see how many rows of data we have.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">nrow</span>(gimap_dataset<span class="sc">$</span>transformed_data<span class="sc">$</span>log2_cpm)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">nrow</span>(gimap_dataset<span class="sc">$</span>transformed_data<span class="sc">$</span>log2_cpm)</span></code></pre></div>
 </div>
 <div id="quality-checks" class="section level2">
 <h2>Quality Checks</h2>
@@ -532,13 +548,13 @@ QC report here</a>.</p>
 <p>After considering the QC report and which filters are
 appropriate/desired for your data, you can apply filters to the data
 using the <code>gimap_filter</code> function.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>gimap_filtered <span class="ot">&lt;-</span> gimap_dataset <span class="sc">%&gt;%</span></span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>  <span class="fu">gimap_filter</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>gimap_filtered <span class="ot">&lt;-</span> gimap_dataset <span class="sc">%&gt;%</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>  <span class="fu">gimap_filter</span>()</span></code></pre></div>
 <p>How many rows of data do we have now after filtering?</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">nrow</span>(gimap_filtered<span class="sc">$</span>filtered_data<span class="sc">$</span>transformed_log2_cpm)</span></code></pre></div>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">str</span>(gimap_dataset<span class="sc">$</span>filtered_data)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">nrow</span>(gimap_filtered<span class="sc">$</span>filtered_data<span class="sc">$</span>transformed_log2_cpm)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="fu">str</span>(gimap_dataset<span class="sc">$</span>filtered_data)</span></code></pre></div>
 <p>Let’s take a look at how many rows of data we have left:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">nrow</span>(gimap_dataset<span class="sc">$</span>filtered_data<span class="sc">$</span>transformed_log2_cpm)</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="fu">nrow</span>(gimap_dataset<span class="sc">$</span>filtered_data<span class="sc">$</span>transformed_log2_cpm)</span></code></pre></div>
 <p>As you can see from the output above, there are fewer pgRNA
 constructs in the filtered dataset following completion of
 filtering.</p>
@@ -573,36 +589,36 @@ correct column names from the <code>sample_data</code> passed to the
 </div>
 <div id="normalization-and-calculating-scores" class="section level2">
 <h2>Normalization and calculating scores</h2>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>gimap_dataset <span class="ot">&lt;-</span> gimap_filtered <span class="sc">%&gt;%</span></span>
-<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>  <span class="fu">gimap_annotate</span>(<span class="at">cell_line =</span> <span class="st">&quot;PC9&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>  <span class="co"># Whatever is specified for &quot;control_name&quot; is what will be used to normalize other data points</span></span>
-<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>  <span class="fu">gimap_normalize</span>(</span>
-<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>    <span class="at">treatments =</span> <span class="st">&quot;drug_treatment&quot;</span>,</span>
-<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>    <span class="at">control_name =</span> <span class="st">&quot;pretreatment&quot;</span></span>
-<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a>  <span class="fu">calc_gi</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a>gimap_dataset <span class="ot">&lt;-</span> gimap_filtered <span class="sc">%&gt;%</span></span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>  <span class="fu">gimap_annotate</span>(<span class="at">cell_line =</span> <span class="st">&quot;PC9&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a>  <span class="co"># Whatever is specified for &quot;control_name&quot; is what will be used to normalize other data points</span></span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a>  <span class="fu">gimap_normalize</span>(</span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a>    <span class="at">treatments =</span> <span class="st">&quot;drug_treatment&quot;</span>,</span>
+<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a>    <span class="at">control_name =</span> <span class="st">&quot;pretreatment&quot;</span></span>
+<span id="cb18-7"><a href="#cb18-7" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb18-8"><a href="#cb18-8" tabindex="-1"></a>  <span class="fu">calc_gi</span>()</span></code></pre></div>
 <p>Here’s what’s included in the GI Scores table:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="fu">head</span>(gimap_dataset<span class="sc">$</span>gi_scores)</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="fu">head</span>(gimap_dataset<span class="sc">$</span>gi_scores)</span></code></pre></div>
 <p>Let’s check out the top results</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="fu">head</span>(dplyr<span class="sc">::</span><span class="fu">arrange</span>(gimap_dataset<span class="sc">$</span>gi_score, fdr))</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="fu">head</span>(dplyr<span class="sc">::</span><span class="fu">arrange</span>(gimap_dataset<span class="sc">$</span>gi_score, fdr))</span></code></pre></div>
 </div>
 <div id="plot-the-results" class="section level2">
 <h2>Plot the results</h2>
 <p>You can remove any samples from these plots by altering the
 <code>reps_to_drop</code> argument.</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="fu">plot_exp_v_obs_scatter</span>(gimap_dataset)</span></code></pre></div>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="fu">plot_rank_scatter</span>(gimap_dataset)</span></code></pre></div>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="fu">plot_volcano</span>(gimap_dataset)</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="fu">plot_exp_v_obs_scatter</span>(gimap_dataset)</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="fu">plot_rank_scatter</span>(gimap_dataset)</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="fu">plot_volcano</span>(gimap_dataset)</span></code></pre></div>
 <div id="plot-specific-target-pair" class="section level3">
 <h3>Plot specific target pair</h3>
 <p>We can pick out a specific pair to plot.</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="co"># &quot;MED12L_MED12&quot; is top result so let&#39;s plot that</span></span>
-<span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a><span class="fu">plot_targets_bar</span>(gimap_dataset, <span class="at">target1 =</span> <span class="st">&quot;MED12L&quot;</span>, <span class="at">target2 =</span> <span class="st">&quot;MED12&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="co"># To plot results, pick out two targets from the gi_score table</span></span>
-<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a><span class="fu">head</span>(dplyr<span class="sc">::</span><span class="fu">arrange</span>(gimap_dataset<span class="sc">$</span>gi_score, fdr))</span>
-<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a></span>
-<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a><span class="co"># &quot;NDEL1_NDE1&quot; is top result so let&#39;s plot that</span></span>
-<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a><span class="fu">plot_targets_bar</span>(gimap_dataset, <span class="at">target1 =</span> <span class="st">&quot;NDEL1&quot;</span>, <span class="at">target2 =</span> <span class="st">&quot;NDE1&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a><span class="co"># &quot;MED12L_MED12&quot; is top result so let&#39;s plot that</span></span>
+<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a><span class="fu">plot_targets_bar</span>(gimap_dataset, <span class="at">target1 =</span> <span class="st">&quot;MED12L&quot;</span>, <span class="at">target2 =</span> <span class="st">&quot;MED12&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="co"># To plot results, pick out two targets from the gi_score table</span></span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a><span class="fu">head</span>(dplyr<span class="sc">::</span><span class="fu">arrange</span>(gimap_dataset<span class="sc">$</span>gi_score, fdr))</span>
+<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a></span>
+<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a><span class="co"># &quot;NDEL1_NDE1&quot; is top result so let&#39;s plot that</span></span>
+<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a><span class="fu">plot_targets_bar</span>(gimap_dataset, <span class="at">target1 =</span> <span class="st">&quot;NDEL1&quot;</span>, <span class="at">target2 =</span> <span class="st">&quot;NDE1&quot;</span>)</span></code></pre></div>
 </div>
 </div>
 <div id="saving-results-to-files" class="section level2">
@@ -615,7 +631,7 @@ correct column names from the <code>sample_data</code> passed to the
 <div id="session-info" class="section level2">
 <h2>Session Info</h2>
 <p>This is just for provenance purposes.</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div>
 </div>
 </div>
 

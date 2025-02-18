@@ -344,6 +344,21 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1>Quick Start for gimap</h1>
 <p>For more background on gimap and the calculations done here, <a href="https://github.com/FredHutch/gimap/blob/main/README.md">read
 here</a></p>
+<div id="requirements" class="section level2">
+<h2>Requirements</h2>
+<p>Besides installing the gimap package, you will also need to install
+wget if you do not already have it installed. This will allow you to
+download the annotation files needed to run <code>gimap</code>.</p>
+<p><a href="https://phoenixnap.com/kb/wget-command-with-examples#How_to_Install_wget">How
+to install wget</a></p>
+<p>To install the <code>gimap</code> package you will need to run:</p>
+<pre><code>install.packages(&quot;gimap&quot;)</code></pre>
+<p>Or you can install the development version from GitHub:</p>
+<pre><code>install.packages(&quot;remotes&quot;)
+remotes::install_github(&quot;FredHutch/gimap&quot;)</code></pre>
+</div>
+<div id="loading-needed-packages" class="section level2">
+<h2>Loading needed packages</h2>
 <pre><code>#&gt; 
 #&gt; Attaching package: &#39;dplyr&#39;
 #&gt; The following objects are masked from &#39;package:stats&#39;:
@@ -352,12 +367,13 @@ here</a></p>
 #&gt; The following objects are masked from &#39;package:base&#39;:
 #&gt; 
 #&gt;     intersect, setdiff, setequal, union</code></pre>
+</div>
 <div id="set-up" class="section level2">
 <h2>Set Up</h2>
 <p>First we can create a folder we will save files to.</p>
 <pre><code>output_dir &lt;- &quot;output_timepoints&quot;
 dir.create(output_dir, showWarnings = FALSE)</code></pre>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>example_data <span class="ot">&lt;-</span> <span class="fu">get_example_data</span>(<span class="st">&quot;count&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>example_data <span class="ot">&lt;-</span> <span class="fu">get_example_data</span>(<span class="st">&quot;count&quot;</span>)</span></code></pre></div>
 </div>
 <div id="setting-up-data" class="section level2">
 <h2>Setting up data</h2>
@@ -371,43 +387,43 @@ counts and specify the construct</li>
 <li><code>sample_metadata</code> - metadata that describes the columns
 of the counts including their timepoints</li>
 </ul>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>counts <span class="ot">&lt;-</span> example_data <span class="sc">%&gt;%</span></span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="st">&quot;Day00_RepA&quot;</span>, <span class="st">&quot;Day05_RepA&quot;</span>, <span class="st">&quot;Day22_RepA&quot;</span>, <span class="st">&quot;Day22_RepB&quot;</span>, <span class="st">&quot;Day22_RepC&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="fu">as.matrix</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>counts <span class="ot">&lt;-</span> example_data <span class="sc">%&gt;%</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="st">&quot;Day00_RepA&quot;</span>, <span class="st">&quot;Day05_RepA&quot;</span>, <span class="st">&quot;Day22_RepA&quot;</span>, <span class="st">&quot;Day22_RepB&quot;</span>, <span class="st">&quot;Day22_RepC&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  <span class="fu">as.matrix</span>()</span></code></pre></div>
 <p><code>pg_id</code> are just the unique IDs listed in the same
 order/sorted the same way as the count data.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>pg_ids <span class="ot">&lt;-</span> example_data <span class="sc">%&gt;%</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="st">&quot;id&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>pg_ids <span class="ot">&lt;-</span> example_data <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="st">&quot;id&quot;</span>)</span></code></pre></div>
 <p>Sample metadata is the information that describes the samples and is
 sorted the same order as the columns in the count data.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>sample_metadata <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  <span class="at">col_names =</span> <span class="fu">c</span>(<span class="st">&quot;Day00_RepA&quot;</span>, <span class="st">&quot;Day05_RepA&quot;</span>, <span class="st">&quot;Day22_RepA&quot;</span>, <span class="st">&quot;Day22_RepB&quot;</span>, <span class="st">&quot;Day22_RepC&quot;</span>),</span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  <span class="at">day =</span> <span class="fu">as.numeric</span>(<span class="fu">c</span>(<span class="st">&quot;0&quot;</span>, <span class="st">&quot;5&quot;</span>, <span class="st">&quot;22&quot;</span>, <span class="st">&quot;22&quot;</span>, <span class="st">&quot;22&quot;</span>)),</span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>  <span class="at">rep =</span> <span class="fu">as.factor</span>(<span class="fu">c</span>(<span class="st">&quot;RepA&quot;</span>, <span class="st">&quot;RepA&quot;</span>, <span class="st">&quot;RepA&quot;</span>, <span class="st">&quot;RepB&quot;</span>, <span class="st">&quot;RepC&quot;</span>))</span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>sample_metadata <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  <span class="at">col_names =</span> <span class="fu">c</span>(<span class="st">&quot;Day00_RepA&quot;</span>, <span class="st">&quot;Day05_RepA&quot;</span>, <span class="st">&quot;Day22_RepA&quot;</span>, <span class="st">&quot;Day22_RepB&quot;</span>, <span class="st">&quot;Day22_RepC&quot;</span>),</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="at">day =</span> <span class="fu">as.numeric</span>(<span class="fu">c</span>(<span class="st">&quot;0&quot;</span>, <span class="st">&quot;5&quot;</span>, <span class="st">&quot;22&quot;</span>, <span class="st">&quot;22&quot;</span>, <span class="st">&quot;22&quot;</span>)),</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  <span class="at">rep =</span> <span class="fu">as.factor</span>(<span class="fu">c</span>(<span class="st">&quot;RepA&quot;</span>, <span class="st">&quot;RepA&quot;</span>, <span class="st">&quot;RepA&quot;</span>, <span class="st">&quot;RepB&quot;</span>, <span class="st">&quot;RepC&quot;</span>))</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>)</span></code></pre></div>
 <p>We’ll need to provide <code>example_counts</code>,
 <code>pg_ids</code> and <code>sample_metadata</code> to
 <code>setup_data()</code>.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>gimap_dataset <span class="ot">&lt;-</span> <span class="fu">setup_data</span>(</span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="at">counts =</span> counts,</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">pg_ids =</span> pg_ids,</span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="at">sample_metadata =</span> sample_metadata</span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>gimap_dataset <span class="ot">&lt;-</span> <span class="fu">setup_data</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="at">counts =</span> counts,</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="at">pg_ids =</span> pg_ids,</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  <span class="at">sample_metadata =</span> sample_metadata</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>)</span></code></pre></div>
 <p>It’s ideal to run quality checks first. The <code>run_qc()</code>
 function will create a report we can look at to assess this.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">run_qc</span>(gimap_dataset,</span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>       <span class="at">output_file =</span> <span class="st">&quot;example_qc_report.Rmd&quot;</span>,</span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>       <span class="at">overwrite =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>       <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">run_qc</span>(gimap_dataset,</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>       <span class="at">output_file =</span> <span class="st">&quot;example_qc_report.Rmd&quot;</span>,</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>       <span class="at">overwrite =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>       <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p>You can take a look at an <a href="http://htmlpreview.github.io/?https://raw.githubusercontent.com/FredHutch/gimap/main/inst/example_qc_report.html">example
 QC report here</a>.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>gimap_dataset <span class="ot">&lt;-</span> gimap_dataset <span class="sc">%&gt;%</span></span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="fu">gimap_filter</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="fu">gimap_annotate</span>(<span class="at">cell_line =</span> <span class="st">&quot;HELA&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  <span class="fu">gimap_normalize</span>(</span>
-<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>    <span class="at">timepoints =</span> <span class="st">&quot;day&quot;</span></span>
-<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>  <span class="fu">calc_gi</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>gimap_dataset <span class="ot">&lt;-</span> gimap_dataset <span class="sc">%&gt;%</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>  <span class="fu">gimap_filter</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="fu">gimap_annotate</span>(<span class="at">cell_line =</span> <span class="st">&quot;HELA&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>  <span class="fu">gimap_normalize</span>(</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>    <span class="at">timepoints =</span> <span class="st">&quot;day&quot;</span></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>  <span class="fu">calc_gi</span>()</span></code></pre></div>
 </div>
 <div id="example-output" class="section level2">
 <h2>Example output</h2>
@@ -431,25 +447,25 @@ score from single targets.<br />
 </li>
 <li><code>fdr</code> - False discovery rate corrected p values</li>
 </ul>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>gimap_dataset<span class="sc">$</span>gi_scores <span class="sc">%&gt;%</span></span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(fdr) <span class="sc">%&gt;%</span></span>
-<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  <span class="fu">head</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">format =</span> <span class="st">&quot;html&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>gimap_dataset<span class="sc">$</span>gi_scores <span class="sc">%&gt;%</span></span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(fdr) <span class="sc">%&gt;%</span></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>  <span class="fu">head</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">format =</span> <span class="st">&quot;html&quot;</span>)</span></code></pre></div>
 </div>
 <div id="plot-the-results" class="section level2">
 <h2>Plot the results</h2>
 <p>You can remove any samples from these plots by altering the
 <code>reps_to_drop</code> argument.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">plot_exp_v_obs_scatter</span>(gimap_dataset, <span class="at">reps_to_drop =</span> <span class="st">&quot;Day05_RepA_early&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">plot_rank_scatter</span>(gimap_dataset, <span class="at">reps_to_drop =</span> <span class="st">&quot;Day05_RepA_early&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">plot_volcano</span>(gimap_dataset, <span class="at">reps_to_drop =</span> <span class="st">&quot;Day05_RepA_early&quot;</span>, <span class="at">facet_rep =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">plot_exp_v_obs_scatter</span>(gimap_dataset, <span class="at">reps_to_drop =</span> <span class="st">&quot;Day05_RepA_early&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">plot_rank_scatter</span>(gimap_dataset, <span class="at">reps_to_drop =</span> <span class="st">&quot;Day05_RepA_early&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">plot_volcano</span>(gimap_dataset, <span class="at">reps_to_drop =</span> <span class="st">&quot;Day05_RepA_early&quot;</span>, <span class="at">facet_rep =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <p>Here’s how you can save plots like the above.</p>
 <pre><code>ggplot2::ggsave(&quot;volcano_plot.png&quot;)</code></pre>
 <div id="plot-specific-target-pair" class="section level3">
 <h3>Plot specific target pair</h3>
 <p>We can pick out a specific pair to plot.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="co"># &quot;NDEL1_NDE1&quot; is top result so let&#39;s plot that</span></span>
-<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="fu">plot_targets_bar</span>(gimap_dataset, <span class="at">target1 =</span> <span class="st">&quot;NDEL1&quot;</span>, <span class="at">target2 =</span> <span class="st">&quot;NDE1&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="co"># &quot;NDEL1_NDE1&quot; is top result so let&#39;s plot that</span></span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a><span class="fu">plot_targets_bar</span>(gimap_dataset, <span class="at">target1 =</span> <span class="st">&quot;NDEL1&quot;</span>, <span class="at">target2 =</span> <span class="st">&quot;NDE1&quot;</span>)</span></code></pre></div>
 </div>
 </div>
 <div id="saving-data-to-a-file" class="section level2">
@@ -462,7 +478,7 @@ scores themselves to a tsv file.</p>
 <div id="session-info" class="section level2">
 <h2>Session Info</h2>
 <p>This is just for provenance purposes.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div>
 </div>
 </div>
 
