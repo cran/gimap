@@ -1,7 +1,7 @@
 Type: Package
 Package: gimap
 Title: Calculate Genetic Interactions for Paired CRISPR Targets
-Version: 1.0.2
+Version: 1.0.3
 Authors@R: c(
   person("Candace", "Savonen",
          email = c("cansav09@gmail.com","csavonen@fredhutch.org"), role = c("aut", "cre")),
@@ -27,7 +27,7 @@ Encoding: UTF-8
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2025-02-18 16:31:46 UTC; candacesavonen
+Packaged: 2025-03-07 18:54:22 UTC; candacesavonen
 Author: Candace Savonen [aut, cre],
   Phoebe Parrish [aut],
   Kate Isaac [aut],
@@ -38,4 +38,4 @@ Author: Candace Savonen [aut, cre],
 Maintainer: Candace Savonen <cansav09@gmail.com>
 Depends: R (>= 3.5.0)
 Repository: CRAN
-Date/Publication: 2025-02-18 23:40:01 UTC
+Date/Publication: 2025-03-07 20:50:02 UTC

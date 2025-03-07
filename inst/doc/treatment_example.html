@@ -552,9 +552,9 @@ using the <code>gimap_filter</code> function.</p>
 <span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>  <span class="fu">gimap_filter</span>()</span></code></pre></div>
 <p>How many rows of data do we have now after filtering?</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">nrow</span>(gimap_filtered<span class="sc">$</span>filtered_data<span class="sc">$</span>transformed_log2_cpm)</span></code></pre></div>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="fu">str</span>(gimap_dataset<span class="sc">$</span>filtered_data)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="fu">str</span>(gimap_filtered<span class="sc">$</span>filtered_data)</span></code></pre></div>
 <p>Let’s take a look at how many rows of data we have left:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="fu">nrow</span>(gimap_dataset<span class="sc">$</span>filtered_data<span class="sc">$</span>transformed_log2_cpm)</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="fu">nrow</span>(gimap_filtered<span class="sc">$</span>filtered_data<span class="sc">$</span>transformed_log2_cpm)</span></code></pre></div>
 <p>As you can see from the output above, there are fewer pgRNA
 constructs in the filtered dataset following completion of
 filtering.</p>
@@ -613,7 +613,7 @@ correct column names from the <code>sample_data</code> passed to the
 <h3>Plot specific target pair</h3>
 <p>We can pick out a specific pair to plot.</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a><span class="co"># &quot;MED12L_MED12&quot; is top result so let&#39;s plot that</span></span>
-<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a><span class="fu">plot_targets_bar</span>(gimap_dataset, <span class="at">target1 =</span> <span class="st">&quot;MED12L&quot;</span>, <span class="at">target2 =</span> <span class="st">&quot;MED12&quot;</span>)</span></code></pre></div>
+<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a><span class="fu">plot_targets_bar</span>(gimap_dataset, <span class="at">target1 =</span> <span class="st">&quot;AP2A1&quot;</span>, <span class="at">target2 =</span> <span class="st">&quot;AP2A2&quot;</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="co"># To plot results, pick out two targets from the gi_score table</span></span>
 <span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a><span class="fu">head</span>(dplyr<span class="sc">::</span><span class="fu">arrange</span>(gimap_dataset<span class="sc">$</span>gi_score, fdr))</span>
 <span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a></span>

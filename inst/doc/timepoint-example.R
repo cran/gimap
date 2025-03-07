@@ -46,6 +46,7 @@ library(dplyr)
 # run_qc(gimap_dataset,
 #        output_file = "example_qc_report.Rmd",
 #        overwrite = TRUE,
+#        plots_dir = "plots",
 #        quiet = TRUE)
 
 ## ----eval = FALSE-------------------------------------------------------------
@@ -73,17 +74,18 @@ library(dplyr)
 # head(dplyr::arrange(gimap_dataset$gi_score, fdr))
 
 ## ----eval = FALSE-------------------------------------------------------------
-# plot_exp_v_obs_scatter(gimap_dataset, reps_to_drop = "Day05_RepA_early")
+# plot_exp_v_obs_scatter(gimap_dataset)
 
 ## ----eval = FALSE-------------------------------------------------------------
-# plot_rank_scatter(gimap_dataset, reps_to_drop = "Day05_RepA_early")
+# plot_rank_scatter(gimap_dataset)
 
 ## ----eval = FALSE-------------------------------------------------------------
-# plot_volcano(gimap_dataset, reps_to_drop = "Day05_RepA_early")
+# plot_volcano(gimap_dataset)
 
 ## ----eval = FALSE-------------------------------------------------------------
 # # "NDEL1_NDE1" is top result so let's plot that
-# plot_targets_bar(gimap_dataset, target1 = "NDEL1", target2 = "NDE1")
+# plot_targets_bar(gimap_dataset, target1 = "TIAL1", target2 = "TIA1",
+#                  reps_to_drop = "Day05_RepA_early")
 
 ## ----eval = FALSE-------------------------------------------------------------
 # sessionInfo()

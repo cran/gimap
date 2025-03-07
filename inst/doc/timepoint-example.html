@@ -549,7 +549,8 @@ many pgRNAs would be filtered out by applying this filter.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">run_qc</span>(gimap_dataset,</span>
 <span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>       <span class="at">output_file =</span> <span class="st">&quot;example_qc_report.Rmd&quot;</span>,</span>
 <span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>       <span class="at">overwrite =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>       <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>       <span class="at">plots_dir =</span> <span class="st">&quot;plots&quot;</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>       <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p>You can take a look at an <a href="http://htmlpreview.github.io/?https://raw.githubusercontent.com/FredHutch/gimap/main/inst/example_qc_report.html">example
 QC report here</a>.</p>
 </div>
@@ -612,14 +613,15 @@ correct column names from the <code>sample_data</code> passed to the
 <h2>Plot the results</h2>
 <p>You can remove any samples from these plots by altering the
 <code>reps_to_drop</code> argument.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="fu">plot_exp_v_obs_scatter</span>(gimap_dataset, <span class="at">reps_to_drop =</span> <span class="st">&quot;Day05_RepA_early&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="fu">plot_rank_scatter</span>(gimap_dataset, <span class="at">reps_to_drop =</span> <span class="st">&quot;Day05_RepA_early&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="fu">plot_volcano</span>(gimap_dataset, <span class="at">reps_to_drop =</span> <span class="st">&quot;Day05_RepA_early&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="fu">plot_exp_v_obs_scatter</span>(gimap_dataset)</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="fu">plot_rank_scatter</span>(gimap_dataset)</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="fu">plot_volcano</span>(gimap_dataset)</span></code></pre></div>
 <div id="plot-specific-target-pair" class="section level3">
 <h3>Plot specific target pair</h3>
 <p>We can pick out a specific pair to plot.</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="co"># &quot;NDEL1_NDE1&quot; is top result so let&#39;s plot that</span></span>
-<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a><span class="fu">plot_targets_bar</span>(gimap_dataset, <span class="at">target1 =</span> <span class="st">&quot;NDEL1&quot;</span>, <span class="at">target2 =</span> <span class="st">&quot;NDE1&quot;</span>)</span></code></pre></div>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a><span class="fu">plot_targets_bar</span>(gimap_dataset, <span class="at">target1 =</span> <span class="st">&quot;TIAL1&quot;</span>, <span class="at">target2 =</span> <span class="st">&quot;TIA1&quot;</span>,</span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a>                 <span class="at">reps_to_drop =</span> <span class="st">&quot;Day05_RepA_early&quot;</span>)</span></code></pre></div>
 </div>
 </div>
 <div id="saving-results-to-files" class="section level2">

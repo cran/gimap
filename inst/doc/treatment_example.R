@@ -50,10 +50,10 @@ knitr::opts_chunk$set(
 # nrow(gimap_filtered$filtered_data$transformed_log2_cpm)
 
 ## ----eval = FALSE-------------------------------------------------------------
-# str(gimap_dataset$filtered_data)
+# str(gimap_filtered$filtered_data)
 
 ## ----eval = FALSE-------------------------------------------------------------
-# nrow(gimap_dataset$filtered_data$transformed_log2_cpm)
+# nrow(gimap_filtered$filtered_data$transformed_log2_cpm)
 
 ## ----eval = FALSE-------------------------------------------------------------
 # gimap_dataset <- gimap_filtered %>%
@@ -82,7 +82,7 @@ knitr::opts_chunk$set(
 
 ## ----eval = FALSE-------------------------------------------------------------
 # # "MED12L_MED12" is top result so let's plot that
-# plot_targets_bar(gimap_dataset, target1 = "MED12L", target2 = "MED12")
+# plot_targets_bar(gimap_dataset, target1 = "AP2A1", target2 = "AP2A2")
 
 ## ----eval = FALSE-------------------------------------------------------------
 # # To plot results, pick out two targets from the gi_score table

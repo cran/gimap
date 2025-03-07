@@ -414,7 +414,8 @@ function will create a report we can look at to assess this.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">run_qc</span>(gimap_dataset,</span>
 <span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>       <span class="at">output_file =</span> <span class="st">&quot;example_qc_report.Rmd&quot;</span>,</span>
 <span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>       <span class="at">overwrite =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>       <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>       <span class="at">plots_dir =</span> <span class="st">&quot;plots&quot;</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>       <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p>You can take a look at an <a href="http://htmlpreview.github.io/?https://raw.githubusercontent.com/FredHutch/gimap/main/inst/example_qc_report.html">example
 QC report here</a>.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>gimap_dataset <span class="ot">&lt;-</span> gimap_dataset <span class="sc">%&gt;%</span></span>
@@ -429,9 +430,6 @@ QC report here</a>.</p>
 <h2>Example output</h2>
 <p>Genetic interaction is calculated by:</p>
 <ul>
-<li><code>rep</code> - indicates which sample from the original the data
-is from. Note the pretreatment is used for calculation and its
-statistics are not reported.</li>
 <li><code>pgRNA_target</code> - what gene(s) were targeted by this the
 original pgRNAs for these data</li>
 <li><code>mean_expected_cs</code> - the average expected genetic
@@ -456,16 +454,17 @@ score from single targets.<br />
 <h2>Plot the results</h2>
 <p>You can remove any samples from these plots by altering the
 <code>reps_to_drop</code> argument.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">plot_exp_v_obs_scatter</span>(gimap_dataset, <span class="at">reps_to_drop =</span> <span class="st">&quot;Day05_RepA_early&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">plot_rank_scatter</span>(gimap_dataset, <span class="at">reps_to_drop =</span> <span class="st">&quot;Day05_RepA_early&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">plot_volcano</span>(gimap_dataset, <span class="at">reps_to_drop =</span> <span class="st">&quot;Day05_RepA_early&quot;</span>, <span class="at">facet_rep =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">plot_exp_v_obs_scatter</span>(gimap_dataset)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">plot_rank_scatter</span>(gimap_dataset)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">plot_volcano</span>(gimap_dataset)</span></code></pre></div>
 <p>Here’s how you can save plots like the above.</p>
 <pre><code>ggplot2::ggsave(&quot;volcano_plot.png&quot;)</code></pre>
 <div id="plot-specific-target-pair" class="section level3">
 <h3>Plot specific target pair</h3>
 <p>We can pick out a specific pair to plot.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="co"># &quot;NDEL1_NDE1&quot; is top result so let&#39;s plot that</span></span>
-<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a><span class="fu">plot_targets_bar</span>(gimap_dataset, <span class="at">target1 =</span> <span class="st">&quot;NDEL1&quot;</span>, <span class="at">target2 =</span> <span class="st">&quot;NDE1&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="co"># &quot;TIAL1_TIA1&quot; is top result so let&#39;s plot that</span></span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a><span class="fu">plot_targets_bar</span>(gimap_dataset, <span class="at">target1 =</span> <span class="st">&quot;TIAL1&quot;</span>, <span class="at">target2 =</span> <span class="st">&quot;TIA1&quot;</span>, </span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>                 <span class="at">reps_to_drop =</span> <span class="st">&quot;Day05_RepA_early&quot;</span>)</span></code></pre></div>
 </div>
 </div>
 <div id="saving-data-to-a-file" class="section level2">
