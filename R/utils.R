@@ -19,7 +19,7 @@ utils::globalVariables(c(
   "mean_single_crispr_1", "expected_single_crispr", "double_crispr", "double_gi_score",
   "fdr", "lfc", "mean_expected_cs", "mean_gi_score", "mean_single_crispr",
   "expected_double_crispr", "p_val", "single_gi_score", "Rank", "broad_target_type",
-  "logfdr", "pointColor", "both", "mean_score"
+  "logfdr", "pointColor", "both", "mean_score", "gi_score", "Day05_RepA"
 ))
 
 
@@ -47,7 +47,6 @@ utils::globalVariables(c(
 get_example_data <- function(which_data,
                              data_dir = system.file("extdata", package = "gimap"),
                              refresh_data = FALSE) {
-
   file_name <- switch(which_data,
     "count" = "PP_pgPEN_HeLa_counts.txt",
     "count_treatment" = "counts_pgPEN_PC9_example.tsv",
@@ -78,7 +77,15 @@ get_example_data <- function(which_data,
       )
     }
   } else {
-    file_path <- file.path(system.file("extdata", package = "gimap"), file_name)
+    file_path <- file.path(data_dir, file_name)
+
+    if (!file.exists(file_path)) {
+      download.file(
+        paste0("https://github.com/FredHutch/gimap/",
+               "raw/refs/heads/main/inst/extdata/", file_name),
+        destfile = file_path
+        )
+    }
   }
   dataset <- switch(which_data,
     "count" = readr::read_tsv(file_path,
@@ -112,14 +119,17 @@ example_data_folder <- function() {
   dirname(file)
 }
 
-# This function sets up the example count data
-save_example_data <- function() {
-  example_data <- get_example_data("count")
+#' Set up example data set for timepoints
+#' @export
+# This function sets up the RDS file for timepoint data
+save_example_data_timepoint <- function() {
+  example_data <- get_example_data("count") %>%
+    dplyr::select(!Day05_RepA)
 
   example_pg_metadata <- get_example_data("meta")
 
   example_counts <- example_data %>%
-    dplyr::select(c("Day00_RepA", "Day05_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC")) %>%
+    dplyr::select(c("Day00_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC")) %>%
     as.matrix()
 
   example_pg_id <- example_data %>%
@@ -129,9 +139,9 @@ save_example_data <- function() {
     dplyr::select(c("id", "seq_1", "seq_2"))
 
   example_sample_metadata <- data.frame(
-    col_names = c("Day00_RepA", "Day05_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC"),
-    day = as.numeric(c("0", "5", "22", "22", "22")),
-    rep = as.factor(c("RepA", "RepA", "RepA", "RepB", "RepC"))
+    col_names = c("Day00_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC"),
+    day = as.numeric(c("0", "22", "22", "22")),
+    rep = as.factor(c("RepA", "RepA", "RepB", "RepC"))
   )
 
   gimap_dataset <- setup_data(
@@ -148,6 +158,45 @@ save_example_data <- function() {
   )
 
   saveRDS(gimap_dataset, file.path(dirname(example_folder), "gimap_dataset.RDS"))
+}
+
+#' Set up example data set for treatments
+#' @export
+# This function sets up the RDS file for treatment data
+save_example_data_treatment <- function() {
+  example_data <- get_example_data("count_treatment")
+
+  example_pg_metadata <- get_example_data("meta")
+
+  example_counts <- example_data %>%
+    select(c("pretreatment", "dmsoA", "dmsoB", "drug1A", "drug1B")) %>%
+    as.matrix()
+
+  example_pg_id <- example_data %>%
+    dplyr::select("id")
+
+  example_pg_metadata <- example_data %>%
+    dplyr::select(c("id", "seq_1", "seq_2"))
+
+  example_sample_metadata <- data.frame(
+    col_names = c("pretreatment", "dmsoA", "dmsoB", "drug1A", "drug1B"),
+    drug_treatment = as.factor(c("pretreatment", "dmso", "dmso", "drug", "drug"))
+  )
+
+  gimap_dataset <- setup_data(
+    counts = example_counts,
+    pg_ids = example_pg_id,
+    sample_metadata = example_sample_metadata
+  )
+
+  example_folder <- list.files(
+    pattern = "PP_pgPEN_HeLa_counts.txt",
+    recursive = TRUE,
+    system.file("extdata", package = "gimap"),
+    full.names = TRUE
+  )
+
+  saveRDS(gimap_dataset, file.path(dirname(example_folder), "gimap_dataset_treatment.RDS"))
 }
 
 plot_options <- function() {
@@ -197,7 +246,7 @@ key_encrypt_creds_path <- function() {
 #'   file_name = "Achilles_common_essentials.csv",
 #'   output_dir = tempdir()
 #' )
-#'}
+#' }
 get_figshare <- function(file_name = NA,
                          item = "19700056",
                          output_dir = tempdir(),
@@ -287,13 +336,14 @@ NULL
 #' delete_example_data()
 #'
 delete_example_data <- function() {
-
-  data_list <- list("count" = NULL,
-                    "count_treatment" = NULL,
-                    "meta" = NULL,
-                    "gimap" = NULL,
-                    "gimap_treatment" = NULL,
-                    "annotation" = NULL)
+  data_list <- list(
+    "count" = NULL,
+    "count_treatment" = NULL,
+    "meta" = NULL,
+    "gimap" = NULL,
+    "gimap_treatment" = NULL,
+    "annotation" = NULL
+  )
 
   message("Deleting the example data files listed in options")
   unlink(options(names(data_list)))

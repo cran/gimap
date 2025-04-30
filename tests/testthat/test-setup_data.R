@@ -25,4 +25,13 @@ test_that("setup_data() works correctly", {
   gimap_dataset <- get_example_data("gimap_treatment")
   metadata <- get_example_data("meta")
   annotation <- get_example_data("annotation")
+
+  data_dir <- system.file("extdata", package = "gimap")
+
+  expect_true(file.exists(file.path(data_dir, "PP_pgPEN_HeLa_counts.txt")))
+  expect_true(file.exists(file.path(data_dir, "counts_pgPEN_PC9_example.tsv")))
+  expect_true(file.exists(file.path(data_dir, "pgRNA_ID_pgPEN_library_comp.csv")))
+  expect_true(file.exists(file.path(data_dir, "gimap_dataset_timepoint.RDS")))
+  expect_true(file.exists(file.path(data_dir, "gimap_dataset_treatment.RDS")))
+  expect_true(file.exists(file.path(data_dir, "pgPEN_annotations.txt")))
 })

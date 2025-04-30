@@ -4,7 +4,8 @@ test_that("Test normalization", {
     gimap_filter() %>%
     gimap_annotate(cell_line = "HELA") %>%
     gimap_normalize(
-      timepoints = "day"
+      timepoints = "day",
+      missing_ids_file = tempfile()
     )
 
   # make sure the important columns are there
@@ -20,7 +21,7 @@ test_that("Test normalization", {
     dplyr::pull(neg_ctrl_med)
 
   # We expect negative controls to be now equal to 0
-  testthat::expect_equal(neg_controls[2:4], c(0, 0, 0))
+  testthat::expect_equal(neg_controls[1:3], c(0, 0, 0))
 
   pos_controls <- gimap_dataset$normalized_log_fc %>%
     dplyr::filter(norm_ctrl_flag == "positive_control") %>%
@@ -30,7 +31,7 @@ test_that("Test normalization", {
 
   # We expect positive controls to be now equal to -1
   testthat::expect_equal(
-    round(pos_controls[-1]),
+    round(pos_controls),
     round(c(-1, -1, -1))
   )
 })
@@ -43,7 +44,8 @@ test_that("Test normalization without expression cutoff", {
     gimap_annotate(cell_line = "HELA") %>%
     gimap_normalize(
       timepoints = "day",
-      normalize_by_unexpressed = TRUE
+      normalize_by_unexpressed = TRUE,
+      missing_ids_file = tempfile()
     )
 
   gimap_dataset_false <- get_example_data("gimap") %>%
@@ -51,7 +53,8 @@ test_that("Test normalization without expression cutoff", {
     gimap_annotate(cell_line = "HELA") %>%
     gimap_normalize(
       timepoints = "day",
-      normalize_by_unexpressed = FALSE
+      normalize_by_unexpressed = FALSE,
+      missing_ids_file = tempfile()
     )
 
   testthat::expect_true(

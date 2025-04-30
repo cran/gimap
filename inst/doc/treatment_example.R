@@ -4,9 +4,12 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 
+## ----echo = FALSE, results = 'hide'-------------------------------------------
+library(gimap)
+
 ## ----eval = FALSE-------------------------------------------------------------
-# library(gimap)
-# library(dplyr)
+# output_dir <- "output_treatment"
+# dir.create(output_dir, showWarnings = FALSE)
 
 ## ----eval = FALSE-------------------------------------------------------------
 # example_data <- get_example_data("count_treatment")
@@ -43,6 +46,14 @@ knitr::opts_chunk$set(
 # nrow(gimap_dataset$transformed_data$log2_cpm)
 
 ## ----eval = FALSE-------------------------------------------------------------
+# run_qc(gimap_dataset,
+#   output_file = file.path(output_dir, "example_qc_report.Rmd"),
+#   overwrite = TRUE,
+#   plots_dir = "plots",
+#   quiet = TRUE
+# )
+
+## ----eval = FALSE-------------------------------------------------------------
 # gimap_filtered <- gimap_dataset %>%
 #   gimap_filter()
 
@@ -73,24 +84,35 @@ knitr::opts_chunk$set(
 
 ## ----eval = FALSE-------------------------------------------------------------
 # plot_exp_v_obs_scatter(gimap_dataset)
+# 
+# # Save it to a file
+# ggsave(file.path(output_dir, "exp_v_obs_scatter.png"))
 
 ## ----eval = FALSE-------------------------------------------------------------
 # plot_rank_scatter(gimap_dataset)
+# 
+# # Save it to a file
+# ggsave(file.path(output_dir, "plot_rank_scatter.png"))
 
 ## ----eval = FALSE-------------------------------------------------------------
 # plot_volcano(gimap_dataset)
-
-## ----eval = FALSE-------------------------------------------------------------
-# # "MED12L_MED12" is top result so let's plot that
-# plot_targets_bar(gimap_dataset, target1 = "AP2A1", target2 = "AP2A2")
-
-## ----eval = FALSE-------------------------------------------------------------
-# # To plot results, pick out two targets from the gi_score table
-# head(dplyr::arrange(gimap_dataset$gi_score, fdr))
 # 
-# # "NDEL1_NDE1" is top result so let's plot that
-# plot_targets_bar(gimap_dataset, target1 = "NDEL1", target2 = "NDE1")
+# # Save it to a file
+# ggsave(file.path(output_dir, "volcano_plot.png"))
 
 ## ----eval = FALSE-------------------------------------------------------------
-# sessionInfo()
+# # "DUSP21_DUSP18" is top result so let's plot that
+# plot_targets(gimap_dataset, target1 = "DUSP21", target2 = "DUSP18")
+# 
+# # Save it to a file
+# ggsave(file.path(output_dir, "DUSP21_DUSP18.png"))
+
+## ----eval = FALSE-------------------------------------------------------------
+# readr::write_tsv(gimap_dataset$gi_scores, file.path(output_dir, "gi_scores.tsv"))
+
+## ----eval = FALSE-------------------------------------------------------------
+# saveRDS(gimap_dataset, file.path(output_dir, "gimap_dataset_final_treatment.RDS"))
+
+## -----------------------------------------------------------------------------
+sessionInfo()
 
