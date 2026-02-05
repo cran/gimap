@@ -27,8 +27,8 @@
 #' Note that you can use custom_tpm with cell_line_annotate but your custom_tpm
 #' will be used instead of the tpm data from DepMap. However other data from
 #' DepMap like CN will be added.
-#' @param annot_dir Where should the annotation files be saved? default is a
-#' temporary directory.
+#' @param annot_dir Where should the annotation files be saved? Default is a
+#' user data directory.
 #' @param refresh_annot Should the annotation file paths saved as options be reset
 #' and the files redownloaded? TRUE or FALSE.
 #' @return A gimap_dataset with annotation data frame that can be retrieve by using
@@ -97,7 +97,7 @@ gimap_annotate <- function(.data = NULL,
                            cell_line_annotate = TRUE,
                            custom_tpm = NULL,
                            cell_line = NULL,
-                           annot_dir = system.file("extdata", package = "gimap"),
+                           annot_dir = gimap_data_dir(),
                            refresh_annot = FALSE) {
   if (!is.null(.data)) gimap_dataset <- .data
 
@@ -139,6 +139,13 @@ gimap_annotate <- function(.data = NULL,
     annotation_df <- readr::read_table(annotation_file)
   } else {
     annotation_df <- get_example_data("annotation")
+    if (is.null(annotation_df)) {
+      warning(
+        "Could not retrieve annotation data. Returning dataset without annotation. ",
+        figshare_manual_download_message("28264271", "pgPEN_annotations.txt")
+      )
+      return(gimap_dataset)
+    }
   }
 
   message("Annotating Data")
@@ -159,16 +166,49 @@ gimap_annotate <- function(.data = NULL,
     # Essential gene labeling is from
     # inst/extdata/Achilles_common_essentials.csv
     control_genes <- ctrl_genes()
+    if (is.null(control_genes)) {
+      warning(
+        "Could not retrieve control genes. Returning dataset without annotation. ",
+        figshare_manual_download_message("19700056", "Achilles_common_essentials.csv")
+      )
+      return(gimap_dataset)
+    }
   }
 
   ############################ Get TPM data ####################################
   if (cell_line_annotate) {
     # This is used to flag things
     ## get TPM and CN information (w/ option for user to upload their own info)
-    depmap_metadata <- readr::read_csv(
-      "https://figshare.com/ndownloader/files/35020903",
-      show_col_types = FALSE
+    depmap_metadata <- tryCatch(
+      {
+        readr::read_csv(
+          "https://figshare.com/ndownloader/files/35020903",
+          show_col_types = FALSE
+        )
+      },
+      error = function(e) {
+        message(
+          "Could not download DepMap metadata. ",
+          "Please check your internet connection and try again later.\n",
+          "Error: ", e$message
+        )
+        return(NULL)
+      }
     )
+
+    if (is.null(depmap_metadata)) {
+      message("Returning dataset without cell line annotation due to network error.")
+      return(gimap_dataset)
+    }
+
+    # Check if expected columns exist in the downloaded data
+    if (!("stripped_cell_line_name" %in% colnames(depmap_metadata))) {
+      message(
+        "DepMap metadata format has changed - expected column 'stripped_cell_line_name' not found. ",
+        "Returning dataset without cell line annotation."
+      )
+      return(gimap_dataset)
+    }
 
     my_depmap_id <- depmap_metadata %>%
       dplyr::filter(stripped_cell_line_name == toupper(cell_line)) %>%
@@ -184,7 +224,10 @@ gimap_annotate <- function(.data = NULL,
     }
     tpm_file <- getOption("tpm_file")
     if (is.null(tpm_file)) tpm_file <- tpm_setup(data_dir = annot_dir)
-    if (!file.exists(tpm_file)) stop("Could not download TPM file")
+    if (is.null(tpm_file) || !file.exists(tpm_file)) {
+      message("Could not download TPM file. Returning dataset without cell line annotation.")
+      return(gimap_dataset)
+    }
 
     op <- options("VROOM_CONNECTION_SIZE" = 500072)
     on.exit(options(op))
@@ -200,7 +243,10 @@ gimap_annotate <- function(.data = NULL,
 
     if (is.null(cn_file)) cn_file <- cn_setup(data_dir = annot_dir)
 
-    if (!file.exists(cn_file)) stop("Could not download CN file")
+    if (is.null(cn_file) || !file.exists(cn_file)) {
+      message("Could not download CN file. Returning dataset without cell line annotation.")
+      return(gimap_dataset)
+    }
     # Read in the CN data
     depmap_cn <- readr::read_csv(cn_file,
       show_col_types = FALSE,
@@ -333,20 +379,27 @@ gimap_annotate <- function(.data = NULL,
 #' @description  This function sets up the tpm data from DepMap is
 #' called by the `gimap_annotate()` function
 #' @param overwrite should the files be re downloaded
-#' @param data_dir What directory should this be saved to? Default is with package
-#' files
+#' @param data_dir What directory should this be saved to? Default is a user data
+#' directory.
 #' @importFrom utils download.file unzip
 tpm_setup <- function(overwrite = TRUE,
-                      data_dir = system.file("extdata", package = "gimap")) {
+                      data_dir = gimap_data_dir()) {
   tpm_file <- file.path(data_dir, "CCLE_expression.csv")
 
   options("tpm_file" = tpm_file)
   if (!file.exists(tpm_file) | overwrite) {
     if (!file.exists(file.path(data_dir, "CCLE_expression.csv.zip"))) {
-      get_figshare(
+      download_result <- get_figshare(
         file_name = "CCLE_expression.csv",
         output_dir = data_dir
       )
+      if (is.null(download_result)) {
+        warning(
+          "Could not download TPM data from Figshare. ",
+          figshare_manual_download_message("19700056", "CCLE_expression.csv")
+        )
+        return(NULL)
+      }
     } else {
       unzip(file.path(data_dir, "CCLE_expression.csv.zip"),
         exdir = data_dir, overwrite = TRUE
@@ -357,6 +410,14 @@ tpm_setup <- function(overwrite = TRUE,
     file.remove(file.path(data_dir, "__MACOSX"))
   }
 
+  # Check if file exists after download attempt
+  if (!file.exists(tpm_file)) {
+    warning(
+      "TPM file not found after download attempt: ", tpm_file, ". ",
+      figshare_manual_download_message("19700056", "CCLE_expression.csv")
+    )
+    return(NULL)
+  }
 
   data_df <- readr::read_csv(tpm_file,
     show_col_types = FALSE,
@@ -385,11 +446,11 @@ tpm_setup <- function(overwrite = TRUE,
 #' @description This function sets up the tpm data from DepMap is called
 #' by the `gimap_annotate()` function if the cn_annotate = TRUE
 #' @param overwrite Should the files be redownloaded?
-#' @param data_dir What directory should this be saved to? Default is with package
-#' files
+#' @param data_dir What directory should this be saved to? Default is a user data
+#' directory.
 #' @importFrom utils download.file unzip
 cn_setup <- function(overwrite = TRUE,
-                     data_dir = system.file("extdata", package = "gimap")) {
+                     data_dir = gimap_data_dir()) {
   options(timeout = 1000)
 
   cn_file <- file.path(
@@ -401,10 +462,17 @@ cn_setup <- function(overwrite = TRUE,
 
   if (!file.exists(cn_file) | overwrite) {
     if (!file.exists(file.path(data_dir, "CCLE_gene_cn.csv.zip"))) {
-      get_figshare(
+      download_result <- get_figshare(
         file_name = "CCLE_gene_cn.csv",
         output_dir = data_dir
       )
+      if (is.null(download_result)) {
+        warning(
+          "Could not download CN data from Figshare. ",
+          figshare_manual_download_message("19700056", "CCLE_gene_cn.csv")
+        )
+        return(NULL)
+      }
     } else {
       unzip(file.path(data_dir, "CCLE_gene_cn.csv.zip"),
         exdir = data_dir, overwrite = TRUE
@@ -413,6 +481,15 @@ cn_setup <- function(overwrite = TRUE,
   }
   if (dir.exists(file.path(data_dir, "__MACOSX"))) {
     file.remove(file.path(data_dir, "__MACOSX"))
+  }
+
+  # Check if file exists after download attempt
+  if (!file.exists(cn_file)) {
+    warning(
+      "CN file not found after download attempt: ", cn_file, ". ",
+      figshare_manual_download_message("19700056", "CCLE_gene_cn.csv")
+    )
+    return(NULL)
   }
 
   data_df <- readr::read_csv(cn_file,
@@ -442,11 +519,11 @@ cn_setup <- function(overwrite = TRUE,
 #' @description This function sets up the control genes file from DepMap is
 #' called by the `gimap_annotate()`
 #' @param overwrite Should the file be redownloaded and reset up?
-#' @param data_dir What directory should this be saved to? Default is with package
-#' files
+#' @param data_dir What directory should this be saved to? Default is a user data
+#' directory.
 #' @importFrom utils download.file unzip
 ctrl_genes <- function(overwrite = TRUE,
-                       data_dir = system.file("extdata", package = "gimap")) {
+                       data_dir = gimap_data_dir()) {
   ctrl_genes_file <- file.path(data_dir, "Achilles_common_essentials.csv")
 
   options("ctrl_genes_file" = ctrl_genes_file)
@@ -457,10 +534,17 @@ ctrl_genes <- function(overwrite = TRUE,
       data_dir,
       "Achilles_common_essentials.csv.zip"
     ))) {
-      get_figshare(
+      download_result <- get_figshare(
         file_name = "Achilles_common_essentials.csv",
         output_dir = data_dir
       )
+      if (is.null(download_result)) {
+        warning(
+          "Could not download control genes data from Figshare. ",
+          figshare_manual_download_message("19700056", "Achilles_common_essentials.csv")
+        )
+        return(NULL)
+      }
     } else {
       unzip(file.path(data_dir, "Achilles_common_essentials.csv.zip"),
         exdir = data_dir,
@@ -471,6 +555,17 @@ ctrl_genes <- function(overwrite = TRUE,
       }
     }
   }
+
+  # Check if file exists after download attempt
+  if (!file.exists(ctrl_genes_file)) {
+    warning(
+      "Control genes file not found after download attempt: ",
+      ctrl_genes_file, ". ",
+      figshare_manual_download_message("19700056", "Achilles_common_essentials.csv")
+    )
+    return(NULL)
+  }
+
   ctrl_genes <- readr::read_csv(ctrl_genes_file, show_col_types = FALSE) %>%
     tidyr::separate(
       col = gene, into = c("gene_symbol", "entrez_id"),
@@ -487,15 +582,39 @@ ctrl_genes <- function(overwrite = TRUE,
 #' @export
 #' @return A list of the cell line names that are available in DepMap for use
 #' for annotation in this package.
-#' @examples
+#' @examples \dontrun{
 #'
 #' cell_lines <- supported_cell_lines()
-#'
+#' }
 supported_cell_lines <- function() {
-  depmap_metadata <- readr::read_csv(
-    "https://figshare.com/ndownloader/files/35020903",
-    show_col_types = FALSE
+  depmap_metadata <- tryCatch(
+    {
+      readr::read_csv(
+        "https://figshare.com/ndownloader/files/35020903",
+        show_col_types = FALSE
+      )
+    },
+    error = function(e) {
+      message(
+        "Could not download DepMap metadata to retrieve supported cell lines. ",
+        "Please check your internet connection and try again later.\n",
+        "Error: ", e$message
+      )
+      return(NULL)
+    }
   )
+
+  if (is.null(depmap_metadata)) {
+    return(character(0))
+  }
+
+  # Check if expected column exists
+  if (!("stripped_cell_line_name" %in% colnames(depmap_metadata))) {
+    message(
+      "DepMap metadata format has changed - expected column 'stripped_cell_line_name' not found."
+    )
+    return(character(0))
+  }
 
   return(sort(depmap_metadata$stripped_cell_line_name))
 }

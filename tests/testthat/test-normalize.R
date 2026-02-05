@@ -1,6 +1,9 @@
 test_that("Test normalization", {
-  testthat::skip_on_cran()
-  gimap_dataset <- get_example_data("gimap") %>%
+  skip_if_figshare_unavailable()
+  skip_if_depmap_changed()
+  data_dir <- test_example_data_dir()
+
+  gimap_dataset <- get_example_data("gimap", data_dir = data_dir) %>%
     gimap_filter() %>%
     gimap_annotate(cell_line = "HELA") %>%
     gimap_normalize(
@@ -37,9 +40,11 @@ test_that("Test normalization", {
 })
 
 test_that("Test normalization without expression cutoff", {
-  testthat::skip_on_cran()
+  skip_if_figshare_unavailable()
+  skip_if_depmap_changed()
+  data_dir <- test_example_data_dir()
 
-  gimap_dataset_true <- get_example_data("gimap") %>%
+  gimap_dataset_true <- get_example_data("gimap", data_dir = data_dir) %>%
     gimap_filter() %>%
     gimap_annotate(cell_line = "HELA") %>%
     gimap_normalize(
@@ -48,7 +53,7 @@ test_that("Test normalization without expression cutoff", {
       missing_ids_file = tempfile()
     )
 
-  gimap_dataset_false <- get_example_data("gimap") %>%
+  gimap_dataset_false <- get_example_data("gimap", data_dir = data_dir) %>%
     gimap_filter() %>%
     gimap_annotate(cell_line = "HELA") %>%
     gimap_normalize(
@@ -59,6 +64,6 @@ test_that("Test normalization without expression cutoff", {
 
   testthat::expect_true(
     all(gimap_dataset_true$normalized_log_fc$lfc[1:6] !=
-          gimap_dataset_false$normalized_log_fc$lfc[1:6]))
-
+      gimap_dataset_false$normalized_log_fc$lfc[1:6])
+  )
 })

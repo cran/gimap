@@ -81,11 +81,17 @@ library(dplyr)
 # # Save it to a file
 # ggsave(file.path(output_dir, "exp_v_obs_scatter.png"))
 
+## ----echo = FALSE, out.width = "100%"-----------------------------------------
+knitr::include_graphics("output_timepoints/exp_v_obs_scatter.png")
+
 ## ----eval = FALSE-------------------------------------------------------------
 # plot_rank_scatter(gimap_dataset)
 # 
 # # Save it to a file
 # ggsave(file.path(output_dir, "plot_rank_scatter.png"))
+
+## ----echo = FALSE, out.width = "100%"-----------------------------------------
+knitr::include_graphics("output_timepoints/plot_rank_scatter.png")
 
 ## ----eval = FALSE-------------------------------------------------------------
 # plot_volcano(gimap_dataset)
@@ -93,12 +99,18 @@ library(dplyr)
 # # Save it to a file
 # ggsave(file.path(output_dir, "volcano_plot.png"))
 
+## ----echo = FALSE, out.width = "100%"-----------------------------------------
+knitr::include_graphics("output_timepoints/volcano_plot.png")
+
 ## ----eval = FALSE-------------------------------------------------------------
 # # "CNOT8_CNOT7" is top result so let's plot that
 # plot_targets(gimap_dataset, target1 = "CNOT8", target2 = "CNOT7")
 # 
 # # Save it to a file
 # ggsave(file.path(output_dir, "CNOT8_CNOT7.png"))
+
+## ----echo = FALSE, out.width = "100%"-----------------------------------------
+knitr::include_graphics("output_timepoints/CNOT8_CNOT7.png")
 
 ## -----------------------------------------------------------------------------
 sessionInfo()

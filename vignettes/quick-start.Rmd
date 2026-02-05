@@ -24,6 +24,13 @@ Besides installing the gimap package, you will also need to install wget if you 
 
 [How to install wget](https://phoenixnap.com/kb/wget-command-with-examples#How_to_Install_wget)
 
+## Data download requirements
+
+Example data are hosted on Figshare and are not bundled with the package to keep
+the CRAN tarball small. `get_example_data()` will download the files on first use
+to a user data directory. For manual download instructions, see the README section
+"Manual data download (Figshare)".
+
 To install the `gimap` package you will need to run:
 ```
 install.packages("gimap")
@@ -150,7 +157,10 @@ plot_exp_v_obs_scatter(gimap_dataset)
 # Save it to a file
 ggsave(file.path(output_dir, "exp_v_obs_scatter.png"))
 ```
-![](output_timepoints/exp_v_obs_scatter.png)
+
+```{r echo = FALSE, out.width = "100%"}
+knitr::include_graphics("output_timepoints/exp_v_obs_scatter.png")
+```
 
 ```{r   eval = FALSE}
 plot_rank_scatter(gimap_dataset)
@@ -158,7 +168,10 @@ plot_rank_scatter(gimap_dataset)
 # Save it to a file
 ggsave(file.path(output_dir, "plot_rank_scatter.png"))
 ```
-![](output_timepoints/plot_rank_scatter.png)
+
+```{r echo = FALSE, out.width = "100%"}
+knitr::include_graphics("output_timepoints/plot_rank_scatter.png")
+```
 
 ```{r   eval = FALSE}
 plot_volcano(gimap_dataset)
@@ -166,7 +179,10 @@ plot_volcano(gimap_dataset)
 # Save it to a file
 ggsave(file.path(output_dir, "volcano_plot.png"))
 ```
-![](output_timepoints/volcano_plot.png)
+
+```{r echo = FALSE, out.width = "100%"}
+knitr::include_graphics("output_timepoints/volcano_plot.png")
+```
 
 ### Plot specific target pair
 
@@ -180,7 +196,9 @@ plot_targets(gimap_dataset, target1 = "CNOT8", target2 = "CNOT7")
 ggsave(file.path(output_dir, "CNOT8_CNOT7.png"))
 ```
 
-![](output_timepoints/CNOT8_CNOT7.png)
+```{r echo = FALSE, out.width = "100%"}
+knitr::include_graphics("output_timepoints/CNOT8_CNOT7.png")
+```
 
 ## Saving data to a file
 

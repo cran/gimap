@@ -5,7 +5,9 @@ example_sample_metadata <- data.frame(id = 1:5, replicate = factor(c(1, 1, 2, 2,
 
 # Test elements inside output list
 test_that("setup_data() works correctly", {
-  testthat::skip_on_cran()
+  skip_if_figshare_unavailable()
+  data_dir <- test_example_data_dir()
+
   result <- setup_data(
     counts = example_counts,
     pg_ids = example_pg_ids,
@@ -19,19 +21,10 @@ test_that("setup_data() works correctly", {
   expect_equal(result$counts_per_sample, apply(example_counts, 2, sum))
 
 
-  counts_timepoint <- get_example_data("count")
-  counts_treatment <- get_example_data("count_treatment")
-  gimap_dataset <- get_example_data("gimap")
-  gimap_dataset <- get_example_data("gimap_treatment")
-  metadata <- get_example_data("meta")
-  annotation <- get_example_data("annotation")
-
-  data_dir <- system.file("extdata", package = "gimap")
-
-  expect_true(file.exists(file.path(data_dir, "PP_pgPEN_HeLa_counts.txt")))
-  expect_true(file.exists(file.path(data_dir, "counts_pgPEN_PC9_example.tsv")))
-  expect_true(file.exists(file.path(data_dir, "pgRNA_ID_pgPEN_library_comp.csv")))
-  expect_true(file.exists(file.path(data_dir, "gimap_dataset_timepoint.RDS")))
-  expect_true(file.exists(file.path(data_dir, "gimap_dataset_treatment.RDS")))
-  expect_true(file.exists(file.path(data_dir, "pgPEN_annotations.txt")))
+  counts_timepoint <- get_example_data("count", data_dir = data_dir)
+  counts_treatment <- get_example_data("count_treatment", data_dir = data_dir)
+  gimap_dataset <- get_example_data("gimap", data_dir = data_dir)
+  gimap_dataset <- get_example_data("gimap_treatment", data_dir = data_dir)
+  metadata <- get_example_data("meta", data_dir = data_dir)
+  annotation <- get_example_data("annotation", data_dir = data_dir)
 })

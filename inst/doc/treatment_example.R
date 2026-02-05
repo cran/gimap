@@ -88,11 +88,17 @@ library(gimap)
 # # Save it to a file
 # ggsave(file.path(output_dir, "exp_v_obs_scatter.png"))
 
+## ----echo = FALSE, out.width = "100%"-----------------------------------------
+knitr::include_graphics("output_treatment/exp_v_obs_scatter.png")
+
 ## ----eval = FALSE-------------------------------------------------------------
 # plot_rank_scatter(gimap_dataset)
 # 
 # # Save it to a file
 # ggsave(file.path(output_dir, "plot_rank_scatter.png"))
+
+## ----echo = FALSE, out.width = "100%"-----------------------------------------
+knitr::include_graphics("output_treatment/plot_rank_scatter.png")
 
 ## ----eval = FALSE-------------------------------------------------------------
 # plot_volcano(gimap_dataset)
@@ -100,12 +106,18 @@ library(gimap)
 # # Save it to a file
 # ggsave(file.path(output_dir, "volcano_plot.png"))
 
+## ----echo = FALSE, out.width = "100%"-----------------------------------------
+knitr::include_graphics("output_treatment/plot_volcano.png")
+
 ## ----eval = FALSE-------------------------------------------------------------
 # # "DUSP21_DUSP18" is top result so let's plot that
 # plot_targets(gimap_dataset, target1 = "DUSP21", target2 = "DUSP18")
 # 
 # # Save it to a file
 # ggsave(file.path(output_dir, "DUSP21_DUSP18.png"))
+
+## ----echo = FALSE, out.width = "100%"-----------------------------------------
+knitr::include_graphics("output_treatment/DUSP21_DUSP18.png")
 
 ## ----eval = FALSE-------------------------------------------------------------
 # readr::write_tsv(gimap_dataset$gi_scores, file.path(output_dir, "gi_scores.tsv"))

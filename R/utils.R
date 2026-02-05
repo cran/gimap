@@ -1,14 +1,15 @@
 utils::globalVariables(c(
-  "pg_ids", "plot_theme()", "negative_control", "positive_control", "mean_observed_cs", "timepoints", "value", "timepoint_avg", "target_type",
+  "id", "pg_ids", "plot_theme()", "negative_control", "positive_control", "mean_observed_cs", "timepoints", "value", "timepoint_avg", "target_type",
   "unexpressed_ctrl_flag", "median", "lfc_adj", "median", "gRNA1_seq", "gRNA2_seq",
   "control_gRNA_seq", "crispr_score", "pgRNA_target", "mean_double_control_crispr",
   "pgRNA_target", "targeting_gRNA_seq", "mean_single_crispr", "double_crispr_score",
+
   "single_crispr_score_1", "single_crispr_score_2", "pgRNA_target_double", "mean_single_crispr_1",
   "mean_single_crispr_2", "mean_double_control_crispr_2",
   "expected_crispr", "term", "estimate", "mean_expected_crispr", "intercept", "slope",
   "p_val_ttest", "p_val_wil", "fde_vals_ttest", "fdr_vals_wil", "double_gi_score",
   "single_gi_score_1", "single_gi_score_2", "gene", "DepMap_ID",
-  "gene1_symbol", "gene2_symbol", "expressed_flag", "norm_ctrl_flag", "bool_vals",
+ "gene1_symbol", "gene2_symbol", "expressed_flag", "norm_ctrl_flag", "bool_vals",
   "filter_name", "counts", "numzero", "name", "value", "lfc_plasmid_vs_late", "lfc_adj",
   "double_gi_score", "count_normalized", "construct",
   "filterFlag", "plasmid_log2_cpm", "log2_cpm", "gene_symbol", "gene_symbol_1", "gene_symbol_2",
@@ -19,8 +20,63 @@ utils::globalVariables(c(
   "mean_single_crispr_1", "expected_single_crispr", "double_crispr", "double_gi_score",
   "fdr", "lfc", "mean_expected_cs", "mean_gi_score", "mean_single_crispr",
   "expected_double_crispr", "p_val", "single_gi_score", "Rank", "broad_target_type",
-  "logfdr", "pointColor", "both", "mean_score", "gi_score", "Day05_RepA"
+  "logfdr", "pointColor", "both", "mean_score", "gi_score", "Day05_RepA", "id"
 ))
+
+#' Check if internet/URL is available
+#' @description Internal helper function to check if an internet resource is
+#' reachable before attempting to download.
+#' @param url The URL to check availability for
+#' @param timeout_seconds Timeout in seconds for the check
+#' @return TRUE if the URL is reachable, FALSE otherwise
+#' @keywords internal
+check_internet_available <- function(url = "https://api.figshare.com",
+                                     timeout_seconds = 5) {
+  tryCatch(
+    {
+      response <- httr::HEAD(url, httr::timeout(timeout_seconds))
+      httr::status_code(response) < 400
+    },
+    error = function(e) {
+      FALSE
+    }
+  )
+}
+
+#' Build manual download instructions for Figshare files
+#' @description Internal helper to build a warning message for manual downloads.
+#' @param item Figshare item ID.
+#' @param files Character vector of file names.
+#' @return A formatted message string.
+#' @keywords internal
+figshare_manual_download_message <- function(item, files) {
+  files_text <- paste0(files, collapse = ", ")
+  paste0(
+    "You can manually download these files from Figshare item ", item, ": ",
+    files_text, ". ",
+    "Use `gimap::get_figshare(file_name = ..., item = \"", item,
+    "\", output_dir = <data_dir>)` or see README \"Manual data download (Figshare)\"."
+  )
+}
+
+#' Resolve and create data directory
+#' @description Internal helper to resolve a writable data directory for downloads.
+#' @param data_dir Optional data directory. If NULL or empty, uses a user data dir.
+#' @return A normalized, existing directory path.
+#' @keywords internal
+gimap_data_dir <- function(data_dir = NULL) {
+  if (is.null(data_dir) || length(data_dir) == 0) {
+    data_dir <- tools::R_user_dir("gimap", "data")
+  } else if (is.na(data_dir) || !nzchar(data_dir)) {
+    data_dir <- tools::R_user_dir("gimap", "data")
+  }
+
+  data_dir <- normalizePath(data_dir, winslash = "/", mustWork = FALSE)
+  if (!dir.exists(data_dir)) {
+    dir.create(data_dir, recursive = TRUE, showWarnings = FALSE)
+  }
+  return(data_dir)
+}
 
 
 #' Returns example data for package
@@ -28,7 +84,8 @@ utils::globalVariables(c(
 #' Which dataset is returned must be specified. Data will be downloaded from Figshare
 #' the first time it is used.
 #' @param which_data options are "count" or "meta"; specifies which example dataset should be returned
-#' @param data_dir Where should the data be saved if applicable?
+#' @param data_dir Where should the data be saved if applicable? If NULL, a user data
+#' directory will be used.
 #' @param refresh_data should the example data that's been downloaded be deleted
 #' and redownloaded?
 #' @export
@@ -45,8 +102,9 @@ utils::globalVariables(c(
 #' annotation <- get_example_data("annotation")
 #' }
 get_example_data <- function(which_data,
-                             data_dir = system.file("extdata", package = "gimap"),
+                             data_dir = NULL,
                              refresh_data = FALSE) {
+  data_dir <- gimap_data_dir(data_dir)
   file_name <- switch(which_data,
     "count" = "PP_pgPEN_HeLa_counts.txt",
     "count_treatment" = "counts_pgPEN_PC9_example.tsv",
@@ -61,32 +119,60 @@ get_example_data <- function(which_data,
     delete_example_data()
   }
 
+  file_path <- file.path(data_dir, file_name)
+
+  # Save file path in the options
+  file_path_list <- list(file_path)
+  names(file_path_list) <- which_data
+  options(file_path_list)
+
   if (!grepl("RDS$", file_name)) {
-    file_path <- file.path(data_dir, file_name)
-
-    # Save file path in the options
-    file_path_list <- list(file_path)
-    names(file_path_list) <- which_data
-    options(file_path_list)
-
     if (!file.exists(file_path)) {
-      get_figshare(
+      download_result <- get_figshare(
         file_name = file_name,
         item = "28264271",
         output_dir = data_dir
       )
+      # Handle case where download failed
+      if (is.null(download_result)) {
+        warning(
+          "Could not download example data '", which_data, "'. ",
+          "The file is not available locally and could not be fetched from Figshare. ",
+          figshare_manual_download_message("28264271", file_name)
+        )
+        return(NULL)
+      }
     }
   } else {
-    file_path <- file.path(data_dir, file_name)
-
-    if (!file.exists(file_path)) {
-      download.file(
-        paste0("https://github.com/FredHutch/gimap/",
-               "raw/refs/heads/main/inst/extdata/", file_name),
-        destfile = file_path
+    # For RDS files, check if underlying data can be obtained
+    result <- tryCatch(
+      {
+        save_example_timepoint_data(data_dir = data_dir)
+        save_example_treatment_data(data_dir = data_dir)
+        TRUE
+      },
+      error = function(e) {
+        message(
+          "Could not prepare example data '", which_data, "': ", e$message
         )
+        return(FALSE)
+      }
+    )
+    if (!isTRUE(result)) {
+      return(NULL)
     }
   }
+
+  # Check if file exists before trying to read
+  if (!file.exists(file_path)) {
+    warning(
+      "Example data file not found: ", file_path, "\n",
+      "The data could not be downloaded. Please check your internet connection.\n",
+      figshare_manual_download_message("28264271", file_name)
+    )
+    return(NULL)
+  }
+
   dataset <- switch(which_data,
     "count" = readr::read_tsv(file_path,
       show_col_types = FALSE
@@ -107,26 +193,23 @@ get_example_data <- function(which_data,
 
 
 #' Get file path to an default credentials RDS
+#' @param data_dir Optional data directory override.
 #' @export
 #' @return Returns the file path to folder where the example data is stored
-example_data_folder <- function() {
-  file <- list.files(
-    pattern = "example_data.md",
-    recursive = TRUE,
-    system.file("extdata", package = "gimap"),
-    full.names = TRUE
-  )
-  dirname(file)
+example_data_folder <- function(data_dir = NULL) {
+  gimap_data_dir(data_dir)
 }
 
-#' Set up example data set for timepoints
+#' Set up example count data
+#' @param data_dir Optional data directory override.
 #' @export
-# This function sets up the RDS file for timepoint data
-save_example_data_timepoint <- function() {
-  example_data <- get_example_data("count") %>%
+#' @return Returns the file path to folder where the example data is stored
+save_example_timepoint_data <- function(data_dir = NULL) {
+  data_dir <- gimap_data_dir(data_dir)
+  example_data <- get_example_data("count", data_dir = data_dir) %>%
     dplyr::select(!Day05_RepA)
 
-  example_pg_metadata <- get_example_data("meta")
+  example_pg_metadata <- get_example_data("meta", data_dir = data_dir)
 
   example_counts <- example_data %>%
     dplyr::select(c("Day00_RepA", "Day22_RepA", "Day22_RepB", "Day22_RepC")) %>%
@@ -150,23 +233,18 @@ save_example_data_timepoint <- function() {
     sample_metadata = example_sample_metadata
   )
 
-  example_folder <- list.files(
-    pattern = "PP_pgPEN_HeLa_counts.txt",
-    recursive = TRUE,
-    system.file("extdata", package = "gimap"),
-    full.names = TRUE
-  )
-
-  saveRDS(gimap_dataset, file.path(dirname(example_folder), "gimap_dataset.RDS"))
+  saveRDS(gimap_dataset, file.path(data_dir, "gimap_dataset_timepoint.RDS"))
 }
 
-#' Set up example data set for treatments
+#' Set up example count data
+#' @param data_dir Optional data directory override.
 #' @export
-# This function sets up the RDS file for treatment data
-save_example_data_treatment <- function() {
-  example_data <- get_example_data("count_treatment")
+#' @return Returns the file path to folder where the example data is stored
+save_example_treatment_data <- function(data_dir = NULL) {
+  data_dir <- gimap_data_dir(data_dir)
+  example_data <- get_example_data("count_treatment", data_dir = data_dir)
 
-  example_pg_metadata <- get_example_data("meta")
+  example_pg_metadata <- get_example_data("meta", data_dir = data_dir)
 
   example_counts <- example_data %>%
     select(c("pretreatment", "dmsoA", "dmsoB", "drug1A", "drug1B")) %>%
@@ -175,8 +253,8 @@ save_example_data_treatment <- function() {
   example_pg_id <- example_data %>%
     dplyr::select("id")
 
-  example_pg_metadata <- example_data %>%
-    dplyr::select(c("id", "seq_1", "seq_2"))
+  example_pg_metadata <- example_pg_metadata %>%
+    dplyr::select(c("pgRNA_ID", "target1_sgRNA_seq", "target1_sgRNA_seq"))
 
   example_sample_metadata <- data.frame(
     col_names = c("pretreatment", "dmsoA", "dmsoB", "drug1A", "drug1B"),
@@ -189,14 +267,7 @@ save_example_data_treatment <- function() {
     sample_metadata = example_sample_metadata
   )
 
-  example_folder <- list.files(
-    pattern = "PP_pgPEN_HeLa_counts.txt",
-    recursive = TRUE,
-    system.file("extdata", package = "gimap"),
-    full.names = TRUE
-  )
-
-  saveRDS(gimap_dataset, file.path(dirname(example_folder), "gimap_dataset_treatment.RDS"))
+  saveRDS(gimap_dataset, file.path(data_dir, "gimap_dataset_treatment.RDS"))
 }
 
 plot_options <- function() {
@@ -235,7 +306,7 @@ key_encrypt_creds_path <- function() {
 #' in as data frames.
 #' @export
 #'
-#' @examples \donttest{
+#' @examples \dontrun{
 #'
 #' get_figshare(
 #'   return_list = TRUE,
@@ -253,25 +324,65 @@ get_figshare <- function(file_name = NA,
                          return_list = FALSE) {
   if (is.null(output_dir)) output_dir <- system.file("extdata", package = "gimap")
 
-  decrypted <- openssl::aes_cbc_decrypt(
-    readRDS(encrypt_creds_path()),
-    key = readRDS(key_encrypt_creds_path())
+  # Check if Figshare is available before attempting to connect
+ if (!check_internet_available("https://api.figshare.com")) {
+    message(
+      "Cannot connect to Figshare. ",
+      "Please check your internet connection and try again later."
+    )
+    return(NULL)
+  }
+
+  decrypted <- tryCatch(
+    {
+      openssl::aes_cbc_decrypt(
+        readRDS(encrypt_creds_path()),
+        key = readRDS(key_encrypt_creds_path())
+      )
+    },
+    error = function(e) {
+      message("Could not decrypt Figshare credentials: ", e$message)
+      return(NULL)
+    }
   )
+
+  if (is.null(decrypted)) {
+    return(NULL)
+  }
 
   url <- file.path("https://api.figshare.com/v2/articles", item)
 
-  # Github api get
-  result <- httr::GET(
-    url,
-    httr::progress(),
-    httr::add_headers(
-      Authorization = paste0("Bearer ", unserialize(decrypted)$client_secret)
-    ),
-    httr::accept_json()
+  # Figshare API get with error handling
+  result <- tryCatch(
+    {
+      httr::GET(
+        url,
+        httr::progress(),
+        httr::add_headers(
+          Authorization = paste0("Bearer ", unserialize(decrypted)$client_secret)
+        ),
+        httr::accept_json()
+      )
+    },
+    error = function(e) {
+      message(
+        "Failed to connect to Figshare API: ", e$message, "\n",
+        "Please check your internet connection and try again later."
+      )
+      return(NULL)
+    }
   )
 
+  if (is.null(result)) {
+    return(NULL)
+  }
+
   if (httr::status_code(result) != 200) {
-    httr::stop_for_status(result)
+    message(
+      "Figshare API returned an error (HTTP ", httr::status_code(result), ").\n",
+      "The resource may be temporarily unavailable. Please try again later."
+    )
+    return(NULL)
   }
 
   # Process and return results
@@ -288,17 +399,36 @@ get_figshare <- function(file_name = NA,
     dplyr::pull(id)
 
   message("Downloading: ", file_name)
-  result <- httr::GET(
-    file.path("https://api.figshare.com/v2/file/download/", file_id),
-    httr::progress(),
-    httr::add_headers(
-      Authorization = paste0("Bearer ", unserialize(decrypted)$client_secret)
-    ),
-    httr::accept_json()
+  result <- tryCatch(
+    {
+      httr::GET(
+        file.path("https://api.figshare.com/v2/file/download/", file_id),
+        httr::progress(),
+        httr::add_headers(
+          Authorization = paste0("Bearer ", unserialize(decrypted)$client_secret)
+        ),
+        httr::accept_json()
+      )
+    },
+    error = function(e) {
+      message(
+        "Failed to download file from Figshare: ", e$message, "\n",
+        "Please check your internet connection and try again later."
+      )
+      return(NULL)
+    }
   )
 
+  if (is.null(result)) {
+    return(NULL)
+  }
+
   if (httr::status_code(result) != 200) {
-    httr::stop_for_status(result)
+    message(
+      "Failed to download file from Figshare (HTTP ", httr::status_code(result), ").\n",
+      "The resource may be temporarily unavailable. Please try again later."
+    )
+    return(NULL)
   }
 
   result_content <- httr::content(result, "text",
