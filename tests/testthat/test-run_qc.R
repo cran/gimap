@@ -1,5 +1,9 @@
 test_that("HTML file is created and content is correct", {
   skip_if_figshare_unavailable()
+  testthat::skip_if_not(
+    rmarkdown::pandoc_available(),
+    "Pandoc is required to render the QC report (install pandoc or skip this test)"
+  )
   data_dir <- test_example_data_dir()
 
   # Does the thing run?
@@ -7,7 +11,6 @@ test_that("HTML file is created and content is correct", {
 
   html_file <- run_qc(gimap_dataset,
     output_file = tempfile(),
-    plots_dir = tempdir(),
     open_results = FALSE,
     overwrite = TRUE
   )
@@ -19,7 +22,6 @@ test_that("HTML file is created and content is correct", {
 
   html_file <- run_qc(gimap_dataset,
     output_file = tempfile(),
-    plots_dir = tempdir(),
     open_results = FALSE,
     overwrite = TRUE
   )

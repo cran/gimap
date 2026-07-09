@@ -4,11 +4,11 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 
-## ----echo = FALSE, results = 'hide'-------------------------------------------
-library(gimap)
-
-## ----echo = FALSE, results = 'hide'-------------------------------------------
-library(dplyr)
+## -----------------------------------------------------------------------------
+suppressPackageStartupMessages({
+  library(gimap)
+  library(dplyr)
+})
 
 ## ----eval = FALSE-------------------------------------------------------------
 # output_dir <- "output_timepoints"
@@ -44,7 +44,6 @@ library(dplyr)
 # run_qc(gimap_dataset,
 #   output_file = file.path(output_dir, "example_qc_report.Rmd"),
 #   overwrite = TRUE,
-#   plots_dir = "plots",
 #   quiet = TRUE
 # )
 

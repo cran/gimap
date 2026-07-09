@@ -47,7 +47,6 @@ library(dplyr)
 # run_qc(gimap_dataset,
 #   output_file = file.path(output_dir, "example_qc_report.Rmd"),
 #   overwrite = TRUE,
-#   plots_dir = "plots",
 #   quiet = TRUE
 # )
 

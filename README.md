@@ -5,18 +5,24 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-  - [Background on paired guide CRISPR](#background-on-paired-guide-crispr)
-  - [What is gimap?](#what-is-gimap)
-  - [Example output from this package:](#example-output-from-this-package)
-  - [pgPEN library design](#pgpen-library-design)
-  - [About Genetic Interaction Scores](#about-genetic-interaction-scores)
-      - [Expected CRISPR scores](#expected-crispr-scores)
-    - [Normalization](#normalization)
-  - [Prerequisites](#prerequisites)
-  - [Manual data download (Figshare)](#manual-data-download-figshare)
-  - [Getting Started Tutorial](#getting-started-tutorial)
-  - [Docker image](#docker-image)
-  - [Citations:](#citations)
+- [Background on paired guide CRISPR](#background-on-paired-guide-crispr)
+- [What is gimap?](#what-is-gimap)
+- [Example output from this package:](#example-output-from-this-package)
+- [pgPEN library design](#pgpen-library-design)
+- [About Genetic Interaction Scores](#about-genetic-interaction-scores)
+    - [Expected CRISPR scores](#expected-crispr-scores)
+  - [t-tests](#t-tests)
+  - [Normalization](#normalization)
+- [Prerequisites](#prerequisites)
+  - [Release version (CRAN)](#release-version-cran)
+  - [Development version (GitHub)](#development-version-github)
+- [Manual data download (Figshare)](#manual-data-download-figshare)
+  - [Where to put files](#where-to-put-files)
+  - [Example data (Figshare item 28264271)](#example-data-figshare-item-28264271)
+  - [DepMap/CCLE annotation data (Figshare item 19700056)](#depmapccle-annotation-data-figshare-item-19700056)
+- [Getting Started Tutorial](#getting-started-tutorial)
+- [Docker image](#docker-image)
+- [Citations:](#citations)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -36,7 +42,7 @@ It's particularly useful for understanding:
 gimap - is a software tool that helps make sense of paired CRISPR screening data. Here's what it does:
 
 1. Takes data from paired CRISPR screens that has been pre-processed by the pgmap software, or any counts table of paired gRNA reads
-2. The input data will have cell counts for how well cells grow (or don't grow) when different genes or pairs of genes are disabled
+2. The input data will have a count of paired gRNA reads which is one per cell, representing cell counts for how well cells grow (or don't grow) when different genes or pairs of genes are disabled
 3. gimap can take this data and helps identify interesting patterns, like:
    - When disabling two genes together is more devastating than you'd expect from disabling them individually (called synthetic lethality)
    - When genes work together cooperatively
@@ -163,26 +169,48 @@ log2FC adjusted =
 
 ## Prerequisites
 
-In order to run this pipeline you will need R and to install the `gimap` package and its dependencies. In R you can run this to install the package:
+In order to run this pipeline you will need R and to install the `gimap` package and its dependencies.
+
+### Release version (CRAN)
+
+The [latest release on CRAN](https://cran.r-project.org/package=gimap) is the recommended install for most users:
+
+```
+install.packages("gimap")
+```
+
+### Development version (GitHub)
+
+The `main` branch on GitHub may contain changes that are not yet on CRAN. If you need the development build, install with the [remotes](https://cran.r-project.org/package=remotes) package:
+
 ```
 install.packages("remotes")
 remotes::install_github("FredHutch/gimap")
 ```
 
+To install from a specific branch or tag, pass the `ref` argument (for example `ref = "main"` or a release tag from the [releases page](https://github.com/FredHutch/gimap/releases)).
+
 ## Manual data download (Figshare)
 
 To keep the package size minimal for CRAN, example and annotation files are not bundled.
-You can download the files manually from Figshare and place them in a writable data
-directory. The package will also download these files automatically on first use.
+`get_example_data()` downloads Figshare examples into a session-specific folder under
+`tempdir()` (see `example_data_folder()`). For a permanent copy, pass `data_dir` to
+`get_example_data()` or download manually into any directory you choose.
 
-### Where to put files
+### Where to put files (manual download)
+
+If you use `get_figshare()` yourself, pick a writable directory (or use the same path
+as `example_data_folder()` for consistency):
 
 ```
 example_dir <- gimap::example_data_folder()
-dir.create(example_dir, recursive = TRUE, showWarnings = FALSE)
 ```
 
 ### Example data (Figshare item 28264271)
+
+You can browse this item on Figshare here:
+[gimap example data (Figshare item 28264271)](https://figshare.com/articles/dataset/gimap_example_data/28264271)
+(DOI: [10.6084/m9.figshare.28264271](https://doi.org/10.6084/m9.figshare.28264271)).
 
 These files are used by `get_example_data()`:
 
@@ -202,6 +230,10 @@ gimap::get_figshare(file_name = "pgPEN_annotations.txt", item = "28264271", outp
 ```
 
 ### DepMap/CCLE annotation data (Figshare item 19700056)
+
+You can browse this item on Figshare here:
+[DepMap 22Q2 Public (Figshare item 19700056)](https://figshare.com/articles/dataset/DepMap_22Q2_Public/19700056)
+(DOI: [10.6084/m9.figshare.19700056](https://doi.org/10.6084/m9.figshare.19700056)).
 
 These files are used by `gimap_annotate()` when cell line annotation is enabled:
 
@@ -253,6 +285,6 @@ And then putting "rstudio" for both the username and password.
 ![See metrics about this repository here](https://cauldron.io/project/8779/stats.svg)
 
 
-\* This work is funded by NCI grant R01CA262556 as well as funding from the Translational Data Science IRC of Fred Hutchinson Cancer Center.
+\* This work was funded in part by the Translational Data Science Integrated Research Center (TDS-IRC) of Fred Hutchinson Cancer Center, NIH/NCI R01CA262556 to A.H.B., the American Cancer Society to A.H.B., NIH/NHGRI R25HG012337 to M.F., and a Washington Research Foundation postdoctoral fellowship to S.O.
 
 Email csavonen@fredhutch.org with any questions!
